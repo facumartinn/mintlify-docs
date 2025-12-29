@@ -1,0 +1,86 @@
+---
+title: Listar Productos
+api: GET /api/v1/products
+description: "Obtener una lista paginada de productos"
+---
+
+# Listar Productos
+
+Obtén una lista de productos con filtrado y paginación opcionales.
+
+<Note>Requiere scope `read:products`.</Note>
+
+## Solicitud
+
+```bash
+GET /api/v1/products
+```
+
+### Parámetros de Consulta
+
+<ParamField query="page" type="integer" default="1">
+  Número de página
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Items por página (máx 100)
+</ParamField>
+
+<ParamField query="search" type="string">
+  Buscar por nombre, código de barras o SKU
+</ParamField>
+
+<ParamField query="category" type="string">
+  Filtrar por categoría
+</ParamField>
+
+<ParamField query="weighable" type="boolean">
+  Filtrar por productos pesables
+</ParamField>
+
+## Ejemplo
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.zenflow.com.ar/api/v1/products?page=1&limit=20&search=widget" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+```javascript Node.js
+const response = await fetch(
+  "https://api.zenflow.com.ar/api/v1/products?search=widget",
+  { headers: { "X-API-Key": "zenflow_live_your_key" } }
+);
+```
+
+</CodeGroup>
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "products": [
+      {
+        "id": 100,
+        "barcode": "7891234567890",
+        "external_id": "SKU-001",
+        "name": "Widget A",
+        "category": "Electrónica",
+        "price": 29.99,
+        "weight": 0.5,
+        "weighable": false,
+        "is_active": true
+      }
+    ],
+    "pagination": {
+      "total": 150,
+      "page": 1,
+      "limit": 20,
+      "total_pages": 8
+    }
+  }
+}
+```

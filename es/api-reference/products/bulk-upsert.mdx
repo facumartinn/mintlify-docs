@@ -1,0 +1,110 @@
+---
+title: Upsert Masivo de Productos
+api: POST /api/v1/products/bulk
+description: "Crear o actualizar múltiples productos a la vez"
+---
+
+# Upsert Masivo de Productos
+
+Crea nuevos productos o actualiza existentes en una sola solicitud. Los productos se identifican por código de barras.
+
+<Note>Requiere scope `write:products`.</Note>
+
+## Solicitud
+
+```bash
+POST /api/v1/products/bulk
+```
+
+### Parámetros del Body
+
+<ParamField body="products" type="array" required>
+  Array de productos a crear o actualizar
+  <Expandable title="propiedades del producto">
+    <ParamField body="barcode" type="string" required>
+      Código de barras del producto (usado para identificación)
+    </ParamField>
+    <ParamField body="name" type="string">
+      Nombre del producto
+    </ParamField>
+    <ParamField body="sku" type="string">
+      SKU / ID externo
+    </ParamField>
+    <ParamField body="category" type="string">
+      Categoría del producto
+    </ParamField>
+    <ParamField body="price" type="number">
+      Precio unitario
+    </ParamField>
+    <ParamField body="weight" type="number">
+      Peso en kg
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X POST "https://api.zenflow.com.ar/api/v1/products/bulk" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "products": [
+      {
+        "barcode": "7891234567890",
+        "name": "Widget A",
+        "sku": "SKU-001",
+        "price": 29.99
+      },
+      {
+        "barcode": "7891234567891",
+        "name": "Widget B",
+        "sku": "SKU-002",
+        "price": 49.99
+      },
+      {
+        "barcode": "7891234567892",
+        "name": "Widget C",
+        "sku": "SKU-003",
+        "price": 19.99
+      }
+    ]
+  }'
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 2,
+    "updated": 1,
+    "errors": []
+  }
+}
+```
+
+### Respuesta con Errores
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": 2,
+    "updated": 0,
+    "errors": [
+      {
+        "barcode": "INVALIDO",
+        "error": "Código de barras es requerido"
+      }
+    ]
+  }
+}
+```
+
+## Mejores Prácticas
+
+- Usa este endpoint para sincronización inicial del catálogo
+- Agrupa productos en lotes de 100 para rendimiento óptimo
+- El endpoint es idempotente - seguro para reintentar en caso de fallo

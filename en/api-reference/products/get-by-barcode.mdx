@@ -1,0 +1,46 @@
+---
+title: Get Product by Barcode
+api: GET /api/v1/products/barcode/{barcode}
+description: "Retrieve a product by barcode"
+---
+
+# Get Product by Barcode
+
+Retrieve a product using its barcode.
+
+<Note>Requires `read:products` scope.</Note>
+
+## Request
+
+```bash
+GET /api/v1/products/barcode/{barcode}
+```
+
+### Path Parameters
+
+<ParamField path="barcode" type="string" required>
+  The product barcode
+</ParamField>
+
+## Example
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/products/barcode/7891234567890" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 100,
+    "barcode": "7891234567890",
+    "external_id": "SKU-001",
+    "name": "Widget A",
+    "category": "Electronics",
+    "price": 29.99
+  }
+}
+```

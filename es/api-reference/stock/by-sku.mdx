@@ -1,0 +1,66 @@
+---
+title: Obtener Stock por SKU
+api: GET /api/v1/stock/sku/{sku}
+description: "Obtener niveles de stock de un producto por SKU"
+---
+
+# Obtener Stock por SKU
+
+Obtén los niveles de stock de un producto usando su SKU.
+
+<Note>Requiere scope `read:stock`.</Note>
+
+## Solicitud
+
+```bash
+GET /api/v1/stock/sku/{sku}
+```
+
+### Parámetros de Ruta
+
+<ParamField path="sku" type="string" required>
+  El SKU del producto (external_id)
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/stock/sku/SKU-001" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "product_id": 100,
+    "sku": "SKU-001",
+    "product_name": "Widget A",
+    "total_quantity": 75,
+    "locations": [
+      {
+        "location_id": "LOC-A1",
+        "quantity": 50
+      },
+      {
+        "location_id": "LOC-B1",
+        "quantity": 25
+      }
+    ]
+  }
+}
+```
+
+## Respuesta de Error
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "not_found",
+    "message": "Producto no encontrado"
+  }
+}
+```

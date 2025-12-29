@@ -1,0 +1,64 @@
+---
+title: Get Product
+api: GET /api/v1/products/{id}
+description: "Retrieve a product by ID"
+---
+
+# Get Product
+
+Retrieve detailed information about a specific product.
+
+<Note>Requires `read:products` scope.</Note>
+
+## Request
+
+```bash
+GET /api/v1/products/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The product ID
+</ParamField>
+
+## Example
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/products/100" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 100,
+    "barcode": "7891234567890",
+    "external_id": "SKU-001",
+    "name": "Widget A",
+    "description": "High-quality widget",
+    "category": "Electronics",
+    "price": 29.99,
+    "weight": 0.5,
+    "width": 10,
+    "height": 5,
+    "depth": 3,
+    "sales_unit": 1,
+    "weighable": false,
+    "photo_url": "https://example.com/widget-a.jpg",
+    "is_active": true,
+    "stock": [
+      {
+        "location_id": "LOC-A1",
+        "location_code": "A-01-01",
+        "quantity": 50
+      }
+    ],
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-14T15:30:00Z"
+  }
+}
+```

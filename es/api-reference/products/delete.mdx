@@ -1,0 +1,60 @@
+---
+title: Eliminar Producto
+api: DELETE /api/v1/products/{id}
+description: "Eliminar (desactivar) un producto"
+---
+
+# Eliminar Producto
+
+Elimina suavemente un producto marcándolo como inactivo.
+
+<Note>Requiere scope `write:products`.</Note>
+
+## Solicitud
+
+```bash
+DELETE /api/v1/products/{id}
+```
+
+### Parámetros de Ruta
+
+<ParamField path="id" type="integer" required>
+  El ID del producto
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X DELETE "https://api.zenflow.com.ar/api/v1/products/100" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "message": "Producto eliminado exitosamente",
+    "product_id": 100
+  }
+}
+```
+
+## Respuesta de Error
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "not_found",
+    "message": "Producto no encontrado"
+  }
+}
+```
+
+<Note>
+  Los productos se eliminan suavemente (marcados como inactivos) en lugar de
+  eliminarse permanentemente. Esto preserva el historial de pedidos que
+  referencian al producto.
+</Note>

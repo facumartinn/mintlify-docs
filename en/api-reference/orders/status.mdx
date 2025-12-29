@@ -1,0 +1,104 @@
+---
+title: Get Order Status
+api: GET /api/v1/orders/{id}/status
+description: "Get the current status of an order"
+---
+
+# Get Order Status
+
+Retrieve the current status of an order.
+
+<Note>Requires `read:orders` scope.</Note>
+
+## Request
+
+```bash
+GET /api/v1/orders/{id}/status
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The order ID
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the request was successful
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="order_id" type="integer">
+      Internal order ID
+    </ResponseField>
+    <ResponseField name="external_id" type="string">
+      Your order ID (order_tenant_id)
+    </ResponseField>
+    <ResponseField name="state_id" type="integer">
+      Current state ID
+    </ResponseField>
+    <ResponseField name="state_picking_id" type="integer">
+      Picking state ID (if in picking flow)
+    </ResponseField>
+    <ResponseField name="updated_at" type="string">
+      Last update timestamp
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.zenflow.com.ar/api/v1/orders/12345/status" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+```javascript Node.js
+const response = await fetch(
+  "https://api.zenflow.com.ar/api/v1/orders/12345/status",
+  {
+    headers: { "X-API-Key": "zenflow_live_your_key" },
+  }
+);
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://api.zenflow.com.ar/api/v1/orders/12345/status',
+    headers={'X-API-Key': 'zenflow_live_your_key'}
+)
+```
+
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "order_id": 12345,
+    "external_id": "ORD-001",
+    "state_id": 2,
+    "state_picking_id": 1,
+    "updated_at": "2024-01-14T15:30:00Z"
+  }
+}
+```
+
+## Order States
+
+| State ID | Name        | Description                         |
+| -------- | ----------- | ----------------------------------- |
+| 1        | Pending     | Order received, awaiting processing |
+| 2        | In Progress | Order is being picked               |
+| 3        | Packed      | Order is packed and ready           |
+| 4        | Completed   | Order shipped                       |
+| 5        | Cancelled   | Order was cancelled                 |

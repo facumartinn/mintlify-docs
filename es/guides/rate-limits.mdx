@@ -1,0 +1,193 @@
+---
+title: Límites de Tasa
+description: 'Entendiendo los límites de tasa de la API y cómo manejarlos'
+---
+
+# Límites de Tasa
+
+Para asegurar un uso justo y estabilidad del sistema, la API de ZenFlow aplica límites de tasa en todas las solicitudes.
+
+## Límites por Defecto
+
+| Ventana de Tiempo | Límite |
+|-------------------|--------|
+| Por Minuto | 60 solicitudes |
+| Por Hora | 1,000 solicitudes |
+| Por Día | 10,000 solicitudes |
+
+<Note>
+  Los límites de tasa son por API key. Puedes solicitar límites más altos contactando a soporte.
+</Note>
+
+## Headers de Límite de Tasa
+
+Cada respuesta de la API incluye información sobre límites de tasa:
+
+```
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 45
+X-RateLimit-Reset: 1705312260
+```
+
+| Header | Descripción |
+|--------|-------------|
+| `X-RateLimit-Limit` | Solicitudes máximas en la ventana actual |
+| `X-RateLimit-Remaining` | Solicitudes restantes |
+| `X-RateLimit-Reset` | Timestamp Unix cuando el límite se reinicia |
+
+## Límite de Tasa Excedido
+
+Cuando excedes el límite de tasa, la API retorna:
+
+```json
+HTTP/1.1 429 Too Many Requests
+Retry-After: 30
+
+{
+  "success": false,
+  "error": {
+    "code": "rate_limit_exceeded",
+    "message": "Límite de tasa excedido. Intenta de nuevo en 30 segundos."
+  }
+}
+```
+
+El header `Retry-After` indica los segundos a esperar antes de reintentar.
+
+## Manejando Límites de Tasa
+
+### Backoff Exponencial
+
+Implementa backoff exponencial para errores de límite de tasa:
+
+<CodeGroup>
+
+```javascript Node.js
+async function fetchWithRetry(url, options, maxRetries = 3) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const response = await fetch(url, options);
+
+    if (response.status !== 429) {
+      return response;
+    }
+
+    const retryAfter = parseInt(response.headers.get('Retry-After') || '1');
+    const delay = Math.min(retryAfter * 1000, Math.pow(2, attempt) * 1000);
+
+    console.log(`Límite de tasa alcanzado. Reintentando en ${delay}ms...`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+
+  throw new Error('Máximo de reintentos excedido');
+}
+```
+
+```python Python
+import time
+import requests
+
+def fetch_with_retry(url, headers, max_retries=3):
+    for attempt in range(max_retries + 1):
+        response = requests.get(url, headers=headers)
+
+        if response.status_code != 429:
+            return response
+
+        retry_after = int(response.headers.get('Retry-After', 1))
+        delay = min(retry_after, 2 ** attempt)
+
+        print(f"Límite de tasa alcanzado. Reintentando en {delay}s...")
+        time.sleep(delay)
+
+    raise Exception("Máximo de reintentos excedido")
+```
+
+</CodeGroup>
+
+### Verificar Solicitudes Restantes
+
+Antes de hacer solicitudes, verifica la cuota restante:
+
+```javascript
+async function makeRequest(url) {
+  const response = await fetch(url, { headers });
+
+  const remaining = parseInt(response.headers.get('X-RateLimit-Remaining'));
+
+  if (remaining < 10) {
+    console.warn('Pocas solicitudes restantes:', remaining);
+    // Opcionalmente reduce la velocidad de solicitudes
+  }
+
+  return response;
+}
+```
+
+### Agrupamiento de Solicitudes
+
+Para operaciones masivas, usa endpoints batch en lugar de llamadas individuales:
+
+```javascript
+// Malo: Solicitudes individuales (usa 100 llamadas API)
+for (const product of products) {
+  await updateStock(product.id, product.quantity);
+}
+
+// Bueno: Solicitud batch (usa 1 llamada API)
+await bulkUpdateStock(products.map(p => ({
+  product_id: p.id,
+  quantity: p.quantity
+})));
+```
+
+## Mejores Prácticas
+
+<CardGroup cols={2}>
+  <Card title="Usa Endpoints Batch" icon="layer-group">
+    Combina múltiples operaciones en solicitudes únicas
+  </Card>
+  <Card title="Cachea Respuestas" icon="database">
+    Cachea datos que no cambian frecuentemente
+  </Card>
+  <Card title="Implementa Backoff" icon="clock">
+    Usa backoff exponencial para reintentos
+  </Card>
+  <Card title="Monitorea Uso" icon="chart-line">
+    Rastrea tus patrones de uso de API
+  </Card>
+</CardGroup>
+
+### Ejemplo de Caché
+
+```javascript
+const cache = new Map();
+const CACHE_TTL = 60000; // 1 minuto
+
+async function getProduct(id) {
+  const cacheKey = `product:${id}`;
+  const cached = cache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  const response = await fetch(`/api/v1/products/${id}`, { headers });
+  const data = await response.json();
+
+  cache.set(cacheKey, { data: data.data, timestamp: Date.now() });
+  return data.data;
+}
+```
+
+## Límites Personalizados
+
+¿Necesitas límites de tasa más altos? Contacta a [support@zenflow.com](mailto:support@zenflow.com) con:
+
+- Tu caso de uso
+- Volumen de solicitudes esperado
+- Patrones de uso pico
+
+Los planes Enterprise incluyen:
+- Límites por defecto más altos
+- Configuración de límites personalizada
+- Soporte dedicado

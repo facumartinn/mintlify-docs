@@ -1,0 +1,143 @@
+---
+title: Crear Ajuste de Stock
+api: POST /api/v1/stock/adjustment
+description: "Agregar o remover stock (ajuste relativo)"
+---
+
+# Crear Ajuste de Stock
+
+Crea un ajuste de stock agregando o removiendo una cantidad.
+
+<Note>Requiere scope `write:stock`.</Note>
+
+## Solicitud
+
+```bash
+POST /api/v1/stock/adjustment
+```
+
+### Parámetros del Body
+
+<ParamField body="product_id" type="integer">
+  ID del producto (o usar sku)
+</ParamField>
+
+<ParamField body="sku" type="string">
+  SKU del producto (alternativa a product_id)
+</ParamField>
+
+<ParamField body="location_id" type="string" required>
+  ID de la ubicación
+</ParamField>
+
+<ParamField body="adjustment_quantity" type="number" required>
+  Cantidad a agregar (positivo) o remover (negativo)
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Razón del ajuste
+</ParamField>
+
+## Ejemplos
+
+### Agregar Stock
+
+```bash
+curl -X POST "https://api.zenflow.com.ar/api/v1/stock/adjustment" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "product_id": 100,
+    "location_id": "LOC-A1",
+    "adjustment_quantity": 25,
+    "reason": "Recibido de proveedor"
+  }'
+```
+
+#### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "type": "addition",
+    "quantity_adjusted": 25,
+    "stock": {
+      "product_id": 100,
+      "location_id": "LOC-A1",
+      "previous_quantity": 50,
+      "new_quantity": 75
+    }
+  }
+}
+```
+
+### Remover Stock
+
+```bash
+curl -X POST "https://api.zenflow.com.ar/api/v1/stock/adjustment" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sku": "SKU-001",
+    "location_id": "LOC-A1",
+    "adjustment_quantity": -10,
+    "reason": "Items dañados removidos"
+  }'
+```
+
+#### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "type": "removal",
+    "quantity_adjusted": -10,
+    "stock": {
+      "product_id": 100,
+      "location_id": "LOC-A1",
+      "previous_quantity": 75,
+      "new_quantity": 65
+    }
+  }
+}
+```
+
+## Respuestas de Error
+
+### 400 Cantidad Cero
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "validation_error",
+    "message": "adjustment_quantity no puede ser cero"
+  }
+}
+```
+
+### 400 Stock Insuficiente
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "adjustment_error",
+    "message": "Stock insuficiente. Disponible: 5, Solicitado: 10"
+  }
+}
+```
+
+### 404 Producto No Encontrado
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "not_found",
+    "message": "Producto no encontrado"
+  }
+}
+```

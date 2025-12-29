@@ -1,0 +1,128 @@
+---
+title: Create Product
+api: POST /api/v1/products
+description: "Create a new product"
+---
+
+# Create Product
+
+Create a new product in your catalog.
+
+<Note>Requires `write:products` scope.</Note>
+
+## Request
+
+```bash
+POST /api/v1/products
+```
+
+### Body Parameters
+
+<ParamField body="name" type="string" required>
+  Product name
+</ParamField>
+
+<ParamField body="barcode" type="string" required>
+  Product barcode (must be unique)
+</ParamField>
+
+<ParamField body="sku" type="string">
+  SKU / external ID
+</ParamField>
+
+<ParamField body="category" type="string">
+  Product category
+</ParamField>
+
+<ParamField body="description" type="string">
+  Product description
+</ParamField>
+
+<ParamField body="price" type="number">
+  Unit price
+</ParamField>
+
+<ParamField body="weight" type="number">
+  Weight in kg
+</ParamField>
+
+<ParamField body="width" type="number">
+  Width in cm
+</ParamField>
+
+<ParamField body="height" type="number">
+  Height in cm
+</ParamField>
+
+<ParamField body="depth" type="number">
+  Depth in cm
+</ParamField>
+
+<ParamField body="weighable" type="boolean" default="false">
+  Whether product is sold by weight
+</ParamField>
+
+<ParamField body="photo_url" type="string">
+  Product image URL
+</ParamField>
+
+## Example
+
+```bash
+curl -X POST "https://api.zenflow.com.ar/api/v1/products" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Widget A",
+    "barcode": "7891234567890",
+    "sku": "SKU-001",
+    "category": "Electronics",
+    "price": 29.99,
+    "weight": 0.5
+  }'
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 100,
+    "barcode": "7891234567890",
+    "external_id": "SKU-001",
+    "name": "Widget A",
+    "category": "Electronics",
+    "price": 29.99,
+    "weight": 0.5,
+    "is_active": true,
+    "created_at": "2024-01-14T10:30:00Z"
+  }
+}
+```
+
+## Error Responses
+
+### 400 Validation Error
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "validation_error",
+    "message": "Name and barcode are required"
+  }
+}
+```
+
+### 409 Already Exists
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "already_exists",
+    "message": "Product with this barcode already exists"
+  }
+}
+```

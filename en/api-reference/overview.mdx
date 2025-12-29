@@ -1,0 +1,163 @@
+---
+title: API Overview
+description: "Complete reference for the ZenFlow REST API"
+---
+
+# API Reference
+
+Welcome to the ZenFlow API reference. This documentation covers all available endpoints for managing orders, products, stock, and webhooks.
+
+## Base URL
+
+```
+https://api.zenflow.com.ar/api/v1
+```
+
+## Authentication
+
+All API requests require authentication via API Key:
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/orders" \
+  -H "X-API-Key: zenflow_live_your_key_here"
+```
+
+See [Authentication](/authentication) for details.
+
+## Response Format
+
+All responses follow a consistent JSON structure:
+
+### Success Response
+
+```json
+{
+  "success": true,
+  "data": {
+    // Response payload
+  }
+}
+```
+
+### Paginated Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [...],
+    "pagination": {
+      "total": 100,
+      "page": 1,
+      "limit": 50,
+      "total_pages": 2
+    }
+  }
+}
+```
+
+### Error Response
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "error_code",
+    "message": "Descriptive error message"
+  }
+}
+```
+
+## Available Endpoints
+
+### Orders
+
+| Method | Endpoint             | Description       | Scope          |
+| ------ | -------------------- | ----------------- | -------------- |
+| GET    | `/orders`            | List orders       | `read:orders`  |
+| GET    | `/orders/:id`        | Get order details | `read:orders`  |
+| POST   | `/orders`            | Create order(s)   | `write:orders` |
+| PUT    | `/orders/:id`        | Update order      | `write:orders` |
+| POST   | `/orders/:id/cancel` | Cancel order      | `write:orders` |
+| GET    | `/orders/:id/status` | Get order status  | `read:orders`  |
+
+### Products
+
+| Method | Endpoint                     | Description            | Scope            |
+| ------ | ---------------------------- | ---------------------- | ---------------- |
+| GET    | `/products`                  | List products          | `read:products`  |
+| GET    | `/products/:id`              | Get product by ID      | `read:products`  |
+| GET    | `/products/sku/:sku`         | Get product by SKU     | `read:products`  |
+| GET    | `/products/barcode/:barcode` | Get product by barcode | `read:products`  |
+| POST   | `/products`                  | Create product         | `write:products` |
+| PUT    | `/products/:id`              | Update product         | `write:products` |
+| POST   | `/products/bulk`             | Bulk upsert products   | `write:products` |
+| DELETE | `/products/:id`              | Delete product         | `write:products` |
+
+### Stock
+
+| Method | Endpoint             | Description          | Scope         |
+| ------ | -------------------- | -------------------- | ------------- |
+| GET    | `/stock`             | Get stock levels     | `read:stock`  |
+| GET    | `/stock/product/:id` | Get product stock    | `read:stock`  |
+| GET    | `/stock/sku/:sku`    | Get stock by SKU     | `read:stock`  |
+| PUT    | `/stock/product/:id` | Update product stock | `write:stock` |
+| POST   | `/stock/bulk`        | Bulk update stock    | `write:stock` |
+| GET    | `/stock/movements`   | Get stock movements  | `read:stock`  |
+| POST   | `/stock/adjustment`  | Create adjustment    | `write:stock` |
+
+### Webhooks
+
+| Method | Endpoint                      | Description           | Scope            |
+| ------ | ----------------------------- | --------------------- | ---------------- |
+| GET    | `/webhooks/events`            | List available events | `read:webhooks`  |
+| GET    | `/webhooks`                   | List webhooks         | `read:webhooks`  |
+| GET    | `/webhooks/:id`               | Get webhook details   | `read:webhooks`  |
+| POST   | `/webhooks`                   | Create webhook        | `write:webhooks` |
+| PUT    | `/webhooks/:id`               | Update webhook        | `write:webhooks` |
+| DELETE | `/webhooks/:id`               | Delete webhook        | `write:webhooks` |
+| POST   | `/webhooks/:id/rotate-secret` | Rotate secret         | `write:webhooks` |
+| POST   | `/webhooks/:id/toggle`        | Enable/disable        | `write:webhooks` |
+| GET    | `/webhooks/:id/deliveries`    | Get delivery history  | `read:webhooks`  |
+| GET    | `/webhooks/:id/stats`         | Get statistics        | `read:webhooks`  |
+| POST   | `/webhooks/:id/test`          | Send test event       | `write:webhooks` |
+
+## Common Parameters
+
+### Pagination
+
+Most list endpoints support pagination:
+
+| Parameter | Type    | Default | Description              |
+| --------- | ------- | ------- | ------------------------ |
+| `page`    | integer | 1       | Page number              |
+| `limit`   | integer | 50      | Items per page (max 100) |
+
+### Filtering
+
+Many endpoints support filtering via query parameters. See individual endpoint documentation for available filters.
+
+### Date Formats
+
+All dates use ISO 8601 format:
+
+- `2024-01-15` (date only)
+- `2024-01-15T10:30:00Z` (with time)
+
+## HTTP Status Codes
+
+| Code | Description    |
+| ---- | -------------- |
+| 200  | Success        |
+| 201  | Created        |
+| 400  | Bad Request    |
+| 401  | Unauthorized   |
+| 403  | Forbidden      |
+| 404  | Not Found      |
+| 409  | Conflict       |
+| 429  | Rate Limited   |
+| 500  | Internal Error |
+
+## Rate Limiting
+
+See [Rate Limits](/guides/rate-limits) for details.

@@ -2,8 +2,8 @@
   "$schema": "https://mintlify.com/schema.json",
   "name": "ZenFlow API",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "dark": "/logo-dark.png",
+    "light": "/logo-light.png"
   },
   "favicon": "/favicon.svg",
   "colors": {
@@ -31,123 +31,169 @@
   },
   "tabs": [
     {
-      "name": "API Reference",
-      "url": "api-reference"
+      "name": "ES",
+      "url": "es"
     },
     {
-      "name": "Integrations",
-      "url": "integrations"
+      "name": "EN",
+      "url": "en"
     }
   ],
-  "anchors": [
-    {
-      "name": "GitHub",
-      "icon": "github",
-      "url": "https://github.com/zenflow"
-    },
-    {
-      "name": "Community",
-      "icon": "discord",
-      "url": "https://discord.gg/zenflow"
-    }
-  ],
-  "i18n": {
-    "defaultLocale": "en",
-    "locales": ["en", "es"],
-    "localeConfigs": {
-      "en": {
-        "label": "English",
-        "path": ""
-      },
-      "es": {
-        "label": "Español",
-        "path": "es"
-      }
-    }
-  },
   "navigation": [
     {
       "group": "Getting Started",
-      "pages": [
-        "introduction",
-        "quickstart",
-        "authentication"
-      ]
+      "pages": ["en/introduction", "en/quickstart", "en/authentication"]
     },
     {
       "group": "Guides",
       "pages": [
-        "guides/erp-integration",
-        "guides/webhooks",
-        "guides/rate-limits",
-        "guides/errors"
+        "en/guides/erp-integration",
+        "en/guides/webhooks",
+        "en/guides/rate-limits",
+        "en/guides/errors"
       ]
     },
     {
       "group": "API Reference",
-      "pages": [
-        "api-reference/overview"
-      ]
+      "pages": ["en/api-reference/overview"]
     },
     {
       "group": "Orders",
       "pages": [
-        "api-reference/orders/list",
-        "api-reference/orders/get",
-        "api-reference/orders/create",
-        "api-reference/orders/update",
-        "api-reference/orders/cancel",
-        "api-reference/orders/status"
+        "en/api-reference/orders/list",
+        "en/api-reference/orders/get",
+        "en/api-reference/orders/create",
+        "en/api-reference/orders/update",
+        "en/api-reference/orders/cancel",
+        "en/api-reference/orders/status"
       ]
     },
     {
       "group": "Products",
       "pages": [
-        "api-reference/products/list",
-        "api-reference/products/get",
-        "api-reference/products/get-by-sku",
-        "api-reference/products/get-by-barcode",
-        "api-reference/products/create",
-        "api-reference/products/update",
-        "api-reference/products/bulk-upsert",
-        "api-reference/products/delete"
+        "en/api-reference/products/list",
+        "en/api-reference/products/get",
+        "en/api-reference/products/get-by-sku",
+        "en/api-reference/products/get-by-barcode",
+        "en/api-reference/products/create",
+        "en/api-reference/products/update",
+        "en/api-reference/products/bulk-upsert",
+        "en/api-reference/products/delete"
       ]
     },
     {
       "group": "Stock",
       "pages": [
-        "api-reference/stock/levels",
-        "api-reference/stock/product",
-        "api-reference/stock/by-sku",
-        "api-reference/stock/update",
-        "api-reference/stock/bulk-update",
-        "api-reference/stock/movements",
-        "api-reference/stock/adjustment"
+        "en/api-reference/stock/levels",
+        "en/api-reference/stock/product",
+        "en/api-reference/stock/by-sku",
+        "en/api-reference/stock/update",
+        "en/api-reference/stock/bulk-update",
+        "en/api-reference/stock/movements",
+        "en/api-reference/stock/adjustment"
       ]
     },
     {
       "group": "Webhooks",
       "pages": [
-        "api-reference/webhooks/overview",
-        "api-reference/webhooks/events",
-        "api-reference/webhooks/list",
-        "api-reference/webhooks/get",
-        "api-reference/webhooks/create",
-        "api-reference/webhooks/update",
-        "api-reference/webhooks/delete",
-        "api-reference/webhooks/rotate-secret",
-        "api-reference/webhooks/toggle",
-        "api-reference/webhooks/deliveries",
-        "api-reference/webhooks/stats",
-        "api-reference/webhooks/test"
+        "en/api-reference/webhooks/overview",
+        "en/api-reference/webhooks/events",
+        "en/api-reference/webhooks/list",
+        "en/api-reference/webhooks/get",
+        "en/api-reference/webhooks/create",
+        "en/api-reference/webhooks/update",
+        "en/api-reference/webhooks/delete",
+        "en/api-reference/webhooks/rotate-secret",
+        "en/api-reference/webhooks/toggle",
+        "en/api-reference/webhooks/deliveries",
+        "en/api-reference/webhooks/stats",
+        "en/api-reference/webhooks/test"
       ]
     },
     {
       "group": "Integrations",
       "pages": [
-        "integrations/overview",
-        "integrations/mercadolibre",
-        "integrations/tiendanube"
+        "en/integrations/overview",
+        "en/integrations/mercadolibre",
+        "en/integrations/tiendanube"
+      ]
+    },
+    {
+      "group": "Comenzar",
+      "pages": ["es/introduction", "es/quickstart", "es/authentication"]
+    },
+    {
+      "group": "Guías",
+      "pages": [
+        "es/guides/erp-integration",
+        "es/guides/webhooks",
+        "es/guides/rate-limits",
+        "es/guides/errors"
+      ]
+    },
+    {
+      "group": "Referencia de API",
+      "pages": ["es/api-reference/overview"]
+    },
+    {
+      "group": "Pedidos",
+      "pages": [
+        "es/api-reference/orders/list",
+        "es/api-reference/orders/get",
+        "es/api-reference/orders/create",
+        "es/api-reference/orders/update",
+        "es/api-reference/orders/cancel",
+        "es/api-reference/orders/status"
+      ]
+    },
+    {
+      "group": "Productos",
+      "pages": [
+        "es/api-reference/products/list",
+        "es/api-reference/products/get",
+        "es/api-reference/products/get-by-sku",
+        "es/api-reference/products/get-by-barcode",
+        "es/api-reference/products/create",
+        "es/api-reference/products/update",
+        "es/api-reference/products/bulk-upsert",
+        "es/api-reference/products/delete"
+      ]
+    },
+    {
+      "group": "Stock",
+      "pages": [
+        "es/api-reference/stock/levels",
+        "es/api-reference/stock/product",
+        "es/api-reference/stock/by-sku",
+        "es/api-reference/stock/update",
+        "es/api-reference/stock/bulk-update",
+        "es/api-reference/stock/movements",
+        "es/api-reference/stock/adjustment"
+      ]
+    },
+    {
+      "group": "Webhooks",
+      "pages": [
+        "es/api-reference/webhooks/overview",
+        "es/api-reference/webhooks/events",
+        "es/api-reference/webhooks/list",
+        "es/api-reference/webhooks/get",
+        "es/api-reference/webhooks/create",
+        "es/api-reference/webhooks/update",
+        "es/api-reference/webhooks/delete",
+        "es/api-reference/webhooks/rotate-secret",
+        "es/api-reference/webhooks/toggle",
+        "es/api-reference/webhooks/deliveries",
+        "es/api-reference/webhooks/stats",
+        "es/api-reference/webhooks/test"
+      ]
+    },
+    {
+      "group": "Integraciones",
+      "pages": [
+        "es/integrations/overview",
+        "es/integrations/mercadolibre",
+        "es/integrations/tiendanube"
       ]
     }
   ],
@@ -157,7 +203,7 @@
     "linkedin": "https://www.linkedin.com/company/zenflow"
   },
   "api": {
-    "baseUrl": "https://api.zenflow.com",
+    "baseUrl": "https://api.zenflow.com.ar",
     "auth": {
       "method": "key",
       "name": "X-API-Key"

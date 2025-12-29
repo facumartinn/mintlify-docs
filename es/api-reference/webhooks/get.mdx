@@ -1,0 +1,62 @@
+---
+title: Obtener Webhook
+api: GET /api/v1/webhooks/{id}
+description: "Obtener detalles del webhook"
+---
+
+# Obtener Webhook
+
+Obtén información detallada sobre un webhook específico.
+
+<Note>Requiere scope `read:webhooks`.</Note>
+
+## Solicitud
+
+```bash
+GET /api/v1/webhooks/{id}
+```
+
+### Parámetros de Ruta
+
+<ParamField path="id" type="string" required>
+  El ID del webhook
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/webhooks/wh_abc123" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "wh_abc123",
+    "name": "Notificaciones de Pedidos",
+    "description": "Envía actualizaciones de pedidos al sistema ERP",
+    "url": "https://example.com/webhooks/zenflow",
+    "events": ["order.created", "order.updated", "order.completed"],
+    "headers": {
+      "X-Custom-Header": "valor-personalizado"
+    },
+    "active": true,
+    "timeout_ms": 30000,
+    "retry_count": 3,
+    "retry_delay_ms": 1000,
+    "total_deliveries": 150,
+    "failed_deliveries": 2,
+    "last_triggered_at": "2024-01-14T15:30:00Z",
+    "last_success_at": "2024-01-14T15:30:00Z",
+    "last_failure_at": "2024-01-10T08:15:00Z",
+    "created_at": "2024-01-01T10:00:00Z",
+    "created_by": {
+      "id": 1,
+      "name": "Usuario Admin"
+    }
+  }
+}
+```

@@ -1,0 +1,79 @@
+---
+title: Actualizar Producto
+api: PUT /api/v1/products/{id}
+description: "Actualizar un producto existente"
+---
+
+# Actualizar Producto
+
+Actualiza los detalles de un producto existente.
+
+<Note>Requiere scope `write:products`.</Note>
+
+## Solicitud
+
+```bash
+PUT /api/v1/products/{id}
+```
+
+### Parámetros de Ruta
+
+<ParamField path="id" type="integer" required>
+  El ID del producto
+</ParamField>
+
+### Parámetros del Body
+
+Todos los campos son opcionales. Solo incluye los campos que deseas actualizar.
+
+<ParamField body="name" type="string">
+  Nombre del producto
+</ParamField>
+
+<ParamField body="category" type="string">
+  Categoría del producto
+</ParamField>
+
+<ParamField body="description" type="string">
+  Descripción del producto
+</ParamField>
+
+<ParamField body="price" type="number">
+  Precio unitario
+</ParamField>
+
+<ParamField body="weight" type="number">
+  Peso en kg
+</ParamField>
+
+<ParamField body="photo_url" type="string">
+  URL de la imagen del producto
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X PUT "https://api.zenflow.com.ar/api/v1/products/100" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "price": 34.99,
+    "category": "Electrónica Premium"
+  }'
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 100,
+    "barcode": "7891234567890",
+    "name": "Widget A",
+    "category": "Electrónica Premium",
+    "price": 34.99,
+    "updated_at": "2024-01-14T15:30:00Z"
+  }
+}
+```

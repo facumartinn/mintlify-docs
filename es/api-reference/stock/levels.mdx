@@ -1,0 +1,90 @@
+---
+title: Obtener Niveles de Stock
+api: GET /api/v1/stock
+description: "Obtener niveles de stock con filtros"
+---
+
+# Obtener Niveles de Stock
+
+Obtén los niveles de stock de todos los productos y ubicaciones.
+
+<Note>Requiere scope `read:stock`.</Note>
+
+## Solicitud
+
+```bash
+GET /api/v1/stock
+```
+
+### Parámetros de Consulta
+
+<ParamField query="page" type="integer" default="1">
+  Número de página
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Items por página (máx 100)
+</ParamField>
+
+<ParamField query="product_id" type="integer">
+  Filtrar por ID de producto
+</ParamField>
+
+<ParamField query="location_id" type="string">
+  Filtrar por ID de ubicación
+</ParamField>
+
+<ParamField query="low_stock" type="boolean">
+  Solo mostrar items por debajo del umbral mínimo
+</ParamField>
+
+<ParamField query="search" type="string">
+  Buscar por nombre de producto, código de barras o SKU
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/stock?low_stock=true" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "stock": [
+      {
+        "product_id": 100,
+        "product_name": "Widget A",
+        "barcode": "7891234567890",
+        "sku": "SKU-001",
+        "location_id": "LOC-A1",
+        "location_code": "A-01-01",
+        "quantity": 50,
+        "min_quantity": 10,
+        "max_quantity": 100
+      },
+      {
+        "product_id": 101,
+        "product_name": "Widget B",
+        "barcode": "7891234567891",
+        "sku": "SKU-002",
+        "location_id": "LOC-A2",
+        "location_code": "A-01-02",
+        "quantity": 5,
+        "min_quantity": 10,
+        "max_quantity": 50
+      }
+    ],
+    "pagination": {
+      "total": 150,
+      "page": 1,
+      "limit": 50,
+      "total_pages": 3
+    }
+  }
+}
+```

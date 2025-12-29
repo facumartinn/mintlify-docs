@@ -1,0 +1,107 @@
+---
+title: Obtener Movimientos de Stock
+api: GET /api/v1/stock/movements
+description: "Obtener historial de movimientos de stock"
+---
+
+# Obtener Movimientos de Stock
+
+Obtén el historial de movimientos de stock (adiciones, remociones, transferencias).
+
+<Note>Requiere scope `read:stock`.</Note>
+
+## Solicitud
+
+```bash
+GET /api/v1/stock/movements
+```
+
+### Parámetros de Consulta
+
+<ParamField query="page" type="integer" default="1">
+  Número de página
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Items por página (máx 100)
+</ParamField>
+
+<ParamField query="product_id" type="integer">
+  Filtrar por ID de producto
+</ParamField>
+
+<ParamField query="location_id" type="string">
+  Filtrar por ID de ubicación
+</ParamField>
+
+<ParamField query="movement_type" type="string">
+  Filtrar por tipo de movimiento (IN, OUT, TRANSFER, ADJUSTMENT)
+</ParamField>
+
+<ParamField query="start_date" type="string">
+  Filtrar desde fecha (YYYY-MM-DD)
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  Filtrar hasta fecha (YYYY-MM-DD)
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/stock/movements?product_id=100&start_date=2024-01-01" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "movements": [
+      {
+        "id": "MOV-12345",
+        "product_id": 100,
+        "product_name": "Widget A",
+        "location_id": "LOC-A1",
+        "movement_type": "IN",
+        "quantity": 50,
+        "previous_quantity": 25,
+        "new_quantity": 75,
+        "reason": "Reposición de stock",
+        "user_id": 1,
+        "created_at": "2024-01-14T10:30:00Z"
+      },
+      {
+        "id": "MOV-12344",
+        "product_id": 100,
+        "product_name": "Widget A",
+        "location_id": "LOC-A1",
+        "movement_type": "OUT",
+        "quantity": 5,
+        "previous_quantity": 30,
+        "new_quantity": 25,
+        "reason": "Fulfillment de pedido",
+        "order_id": 12345,
+        "created_at": "2024-01-13T15:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 50,
+      "total": 150,
+      "total_pages": 3
+    }
+  }
+}
+```
+
+## Tipos de Movimiento
+
+| Tipo         | Descripción                              |
+| ------------ | ---------------------------------------- |
+| `IN`         | Stock agregado (recepción, devoluciones) |
+| `OUT`        | Stock removido (pedidos, daños)          |
+| `TRANSFER`   | Stock movido entre ubicaciones           |
+| `ADJUSTMENT` | Corrección de conteo de inventario       |

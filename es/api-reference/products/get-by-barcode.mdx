@@ -1,0 +1,46 @@
+---
+title: Obtener Producto por Código de Barras
+api: GET /api/v1/products/barcode/{barcode}
+description: "Obtener un producto por código de barras"
+---
+
+# Obtener Producto por Código de Barras
+
+Obtén un producto usando su código de barras.
+
+<Note>Requiere scope `read:products`.</Note>
+
+## Solicitud
+
+```bash
+GET /api/v1/products/barcode/{barcode}
+```
+
+### Parámetros de Ruta
+
+<ParamField path="barcode" type="string" required>
+  El código de barras del producto
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/products/barcode/7891234567890" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 100,
+    "barcode": "7891234567890",
+    "external_id": "SKU-001",
+    "name": "Widget A",
+    "category": "Electrónica",
+    "price": 29.99
+  }
+}
+```

@@ -1,0 +1,163 @@
+---
+title: Resumen de la API
+description: "Referencia completa de la API REST de ZenFlow"
+---
+
+# Referencia de API
+
+Bienvenido a la referencia de la API de ZenFlow. Esta documentación cubre todos los endpoints disponibles para gestionar pedidos, productos, stock y webhooks.
+
+## URL Base
+
+```
+https://api.zenflow.com.ar/api/v1
+```
+
+## Autenticación
+
+Todas las solicitudes a la API requieren autenticación mediante API Key:
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/orders" \
+  -H "X-API-Key: zenflow_live_your_key_here"
+```
+
+Consulta [Autenticación](/authentication) para más detalles.
+
+## Formato de Respuesta
+
+Todas las respuestas siguen una estructura JSON consistente:
+
+### Respuesta Exitosa
+
+```json
+{
+  "success": true,
+  "data": {
+    // Payload de respuesta
+  }
+}
+```
+
+### Respuesta Paginada
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [...],
+    "pagination": {
+      "total": 100,
+      "page": 1,
+      "limit": 50,
+      "total_pages": 2
+    }
+  }
+}
+```
+
+### Respuesta de Error
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "codigo_error",
+    "message": "Mensaje de error descriptivo"
+  }
+}
+```
+
+## Endpoints Disponibles
+
+### Pedidos
+
+| Método | Endpoint             | Descripción                 | Scope          |
+| ------ | -------------------- | --------------------------- | -------------- |
+| GET    | `/orders`            | Listar pedidos              | `read:orders`  |
+| GET    | `/orders/:id`        | Obtener detalles del pedido | `read:orders`  |
+| POST   | `/orders`            | Crear pedido(s)             | `write:orders` |
+| PUT    | `/orders/:id`        | Actualizar pedido           | `write:orders` |
+| POST   | `/orders/:id/cancel` | Cancelar pedido             | `write:orders` |
+| GET    | `/orders/:id/status` | Obtener estado del pedido   | `read:orders`  |
+
+### Productos
+
+| Método | Endpoint                     | Descripción                           | Scope            |
+| ------ | ---------------------------- | ------------------------------------- | ---------------- |
+| GET    | `/products`                  | Listar productos                      | `read:products`  |
+| GET    | `/products/:id`              | Obtener producto por ID               | `read:products`  |
+| GET    | `/products/sku/:sku`         | Obtener producto por SKU              | `read:products`  |
+| GET    | `/products/barcode/:barcode` | Obtener producto por código de barras | `read:products`  |
+| POST   | `/products`                  | Crear producto                        | `write:products` |
+| PUT    | `/products/:id`              | Actualizar producto                   | `write:products` |
+| POST   | `/products/bulk`             | Upsert masivo de productos            | `write:products` |
+| DELETE | `/products/:id`              | Eliminar producto                     | `write:products` |
+
+### Stock
+
+| Método | Endpoint             | Descripción                   | Scope         |
+| ------ | -------------------- | ----------------------------- | ------------- |
+| GET    | `/stock`             | Obtener niveles de stock      | `read:stock`  |
+| GET    | `/stock/product/:id` | Obtener stock del producto    | `read:stock`  |
+| GET    | `/stock/sku/:sku`    | Obtener stock por SKU         | `read:stock`  |
+| PUT    | `/stock/product/:id` | Actualizar stock del producto | `write:stock` |
+| POST   | `/stock/bulk`        | Actualización masiva de stock | `write:stock` |
+| GET    | `/stock/movements`   | Obtener movimientos de stock  | `read:stock`  |
+| POST   | `/stock/adjustment`  | Crear ajuste                  | `write:stock` |
+
+### Webhooks
+
+| Método | Endpoint                      | Descripción                   | Scope            |
+| ------ | ----------------------------- | ----------------------------- | ---------------- |
+| GET    | `/webhooks/events`            | Listar eventos disponibles    | `read:webhooks`  |
+| GET    | `/webhooks`                   | Listar webhooks               | `read:webhooks`  |
+| GET    | `/webhooks/:id`               | Obtener detalles del webhook  | `read:webhooks`  |
+| POST   | `/webhooks`                   | Crear webhook                 | `write:webhooks` |
+| PUT    | `/webhooks/:id`               | Actualizar webhook            | `write:webhooks` |
+| DELETE | `/webhooks/:id`               | Eliminar webhook              | `write:webhooks` |
+| POST   | `/webhooks/:id/rotate-secret` | Rotar secret                  | `write:webhooks` |
+| POST   | `/webhooks/:id/toggle`        | Habilitar/deshabilitar        | `write:webhooks` |
+| GET    | `/webhooks/:id/deliveries`    | Obtener historial de entregas | `read:webhooks`  |
+| GET    | `/webhooks/:id/stats`         | Obtener estadísticas          | `read:webhooks`  |
+| POST   | `/webhooks/:id/test`          | Enviar evento de prueba       | `write:webhooks` |
+
+## Parámetros Comunes
+
+### Paginación
+
+La mayoría de los endpoints de listado soportan paginación:
+
+| Parámetro | Tipo    | Por Defecto | Descripción                |
+| --------- | ------- | ----------- | -------------------------- |
+| `page`    | integer | 1           | Número de página           |
+| `limit`   | integer | 50          | Items por página (máx 100) |
+
+### Filtrado
+
+Muchos endpoints soportan filtrado mediante parámetros de consulta. Consulta la documentación de cada endpoint para los filtros disponibles.
+
+### Formatos de Fecha
+
+Todas las fechas usan formato ISO 8601:
+
+- `2024-01-15` (solo fecha)
+- `2024-01-15T10:30:00Z` (con hora)
+
+## Códigos de Estado HTTP
+
+| Código | Descripción          |
+| ------ | -------------------- |
+| 200    | Éxito                |
+| 201    | Creado               |
+| 400    | Solicitud Incorrecta |
+| 401    | No Autorizado        |
+| 403    | Prohibido            |
+| 404    | No Encontrado        |
+| 409    | Conflicto            |
+| 429    | Límite de Tasa       |
+| 500    | Error Interno        |
+
+## Límites de Tasa
+
+Consulta [Límites de Tasa](/guides/rate-limits) para más detalles.

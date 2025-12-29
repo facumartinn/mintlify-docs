@@ -1,0 +1,84 @@
+---
+title: List Available Events
+api: GET /api/v1/webhooks/events
+description: "Get list of available webhook events"
+---
+
+# List Available Events
+
+Retrieve a list of all available webhook event types.
+
+<Note>Requires `read:webhooks` scope.</Note>
+
+## Request
+
+```bash
+GET /api/v1/webhooks/events
+```
+
+## Example
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/webhooks/events" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "events": [
+      "order.created",
+      "order.updated",
+      "order.cancelled",
+      "order.completed",
+      "product.created",
+      "product.updated",
+      "product.deleted",
+      "stock.updated",
+      "stock.low_alert",
+      "stock.movement_created",
+      "flow.started",
+      "flow.completed",
+      "flow.cancelled"
+    ]
+  }
+}
+```
+
+## Event Categories
+
+### Order Events
+
+| Event             | Trigger                        |
+| ----------------- | ------------------------------ |
+| `order.created`   | New order is created           |
+| `order.updated`   | Order details or state changes |
+| `order.cancelled` | Order is cancelled             |
+| `order.completed` | Order fulfillment is complete  |
+
+### Product Events
+
+| Event             | Trigger                |
+| ----------------- | ---------------------- |
+| `product.created` | New product is added   |
+| `product.updated` | Product details change |
+| `product.deleted` | Product is deactivated |
+
+### Stock Events
+
+| Event                    | Trigger                    |
+| ------------------------ | -------------------------- |
+| `stock.updated`          | Stock level changes        |
+| `stock.low_alert`        | Stock falls below minimum  |
+| `stock.movement_created` | Stock movement is recorded |
+
+### Flow Events
+
+| Event            | Trigger                   |
+| ---------------- | ------------------------- |
+| `flow.started`   | Picking flow begins       |
+| `flow.completed` | Picking flow finishes     |
+| `flow.cancelled` | Picking flow is cancelled |

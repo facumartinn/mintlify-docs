@@ -1,0 +1,62 @@
+---
+title: Listar Webhooks
+api: GET /api/v1/webhooks
+description: "Listar todos los webhooks de tu tenant"
+---
+
+# Listar Webhooks
+
+Obtén todos los webhooks configurados.
+
+<Note>Requiere scope `read:webhooks`.</Note>
+
+## Solicitud
+
+```bash
+GET /api/v1/webhooks
+```
+
+### Parámetros de Consulta
+
+<ParamField query="active" type="boolean">
+  Filtrar por estado activo
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/webhooks" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "wh_abc123",
+      "name": "Notificaciones de Pedidos",
+      "url": "https://example.com/webhooks/zenflow",
+      "events": ["order.created", "order.updated", "order.completed"],
+      "active": true,
+      "total_deliveries": 150,
+      "failed_deliveries": 2,
+      "last_triggered_at": "2024-01-14T15:30:00Z",
+      "last_success_at": "2024-01-14T15:30:00Z",
+      "created_at": "2024-01-01T10:00:00Z"
+    },
+    {
+      "id": "wh_def456",
+      "name": "Alertas de Stock",
+      "url": "https://example.com/webhooks/stock",
+      "events": ["stock.updated", "stock.low_alert"],
+      "active": true,
+      "total_deliveries": 45,
+      "failed_deliveries": 0,
+      "created_at": "2024-01-05T14:00:00Z"
+    }
+  ]
+}
+```

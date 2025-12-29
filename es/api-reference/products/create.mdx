@@ -1,0 +1,128 @@
+---
+title: Crear Producto
+api: POST /api/v1/products
+description: "Crear un nuevo producto"
+---
+
+# Crear Producto
+
+Crea un nuevo producto en tu catálogo.
+
+<Note>Requiere scope `write:products`.</Note>
+
+## Solicitud
+
+```bash
+POST /api/v1/products
+```
+
+### Parámetros del Body
+
+<ParamField body="name" type="string" required>
+  Nombre del producto
+</ParamField>
+
+<ParamField body="barcode" type="string" required>
+  Código de barras del producto (debe ser único)
+</ParamField>
+
+<ParamField body="sku" type="string">
+  SKU / ID externo
+</ParamField>
+
+<ParamField body="category" type="string">
+  Categoría del producto
+</ParamField>
+
+<ParamField body="description" type="string">
+  Descripción del producto
+</ParamField>
+
+<ParamField body="price" type="number">
+  Precio unitario
+</ParamField>
+
+<ParamField body="weight" type="number">
+  Peso en kg
+</ParamField>
+
+<ParamField body="width" type="number">
+  Ancho en cm
+</ParamField>
+
+<ParamField body="height" type="number">
+  Alto en cm
+</ParamField>
+
+<ParamField body="depth" type="number">
+  Profundidad en cm
+</ParamField>
+
+<ParamField body="weighable" type="boolean" default="false">
+  Si el producto se vende por peso
+</ParamField>
+
+<ParamField body="photo_url" type="string">
+  URL de la imagen del producto
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X POST "https://api.zenflow.com.ar/api/v1/products" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Widget A",
+    "barcode": "7891234567890",
+    "sku": "SKU-001",
+    "category": "Electrónica",
+    "price": 29.99,
+    "weight": 0.5
+  }'
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 100,
+    "barcode": "7891234567890",
+    "external_id": "SKU-001",
+    "name": "Widget A",
+    "category": "Electrónica",
+    "price": 29.99,
+    "weight": 0.5,
+    "is_active": true,
+    "created_at": "2024-01-14T10:30:00Z"
+  }
+}
+```
+
+## Respuestas de Error
+
+### 400 Error de Validación
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "validation_error",
+    "message": "Nombre y código de barras son requeridos"
+  }
+}
+```
+
+### 409 Ya Existe
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "already_exists",
+    "message": "Ya existe un producto con este código de barras"
+  }
+}
+```

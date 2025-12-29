@@ -1,0 +1,104 @@
+---
+title: Obtener Estado del Pedido
+api: GET /api/v1/orders/{id}/status
+description: "Obtener el estado actual de un pedido"
+---
+
+# Obtener Estado del Pedido
+
+Obtén el estado actual de un pedido.
+
+<Note>Requiere scope `read:orders`.</Note>
+
+## Solicitud
+
+```bash
+GET /api/v1/orders/{id}/status
+```
+
+### Parámetros de Ruta
+
+<ParamField path="id" type="integer" required>
+  El ID del pedido
+</ParamField>
+
+## Respuesta
+
+<ResponseField name="success" type="boolean">
+  Si la solicitud fue exitosa
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="propiedades">
+    <ResponseField name="order_id" type="integer">
+      ID interno del pedido
+    </ResponseField>
+    <ResponseField name="external_id" type="string">
+      Tu ID del pedido (order_tenant_id)
+    </ResponseField>
+    <ResponseField name="state_id" type="integer">
+      ID del estado actual
+    </ResponseField>
+    <ResponseField name="state_picking_id" type="integer">
+      ID del estado de picking (si está en flujo de picking)
+    </ResponseField>
+    <ResponseField name="updated_at" type="string">
+      Timestamp de última actualización
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Ejemplo
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.zenflow.com.ar/api/v1/orders/12345/status" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+```javascript Node.js
+const response = await fetch(
+  "https://api.zenflow.com.ar/api/v1/orders/12345/status",
+  {
+    headers: { "X-API-Key": "zenflow_live_your_key" },
+  }
+);
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://api.zenflow.com.ar/api/v1/orders/12345/status',
+    headers={'X-API-Key': 'zenflow_live_your_key'}
+)
+```
+
+</CodeGroup>
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "order_id": 12345,
+    "external_id": "ORD-001",
+    "state_id": 2,
+    "state_picking_id": 1,
+    "updated_at": "2024-01-14T15:30:00Z"
+  }
+}
+```
+
+## Estados del Pedido
+
+| ID Estado | Nombre      | Descripción                              |
+| --------- | ----------- | ---------------------------------------- |
+| 1         | Pending     | Pedido recibido, esperando procesamiento |
+| 2         | In Progress | Pedido en proceso de picking             |
+| 3         | Packed      | Pedido empacado y listo                  |
+| 4         | Completed   | Pedido enviado                           |
+| 5         | Cancelled   | Pedido cancelado                         |

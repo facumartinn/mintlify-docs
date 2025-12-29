@@ -1,6 +1,6 @@
 ---
 title: Autenticacion
-description: 'Aprende a autenticarte con la API de ZenFlow'
+description: "Aprende a autenticarte con la API de ZenFlow"
 ---
 
 # Autenticacion
@@ -20,7 +20,8 @@ La API de ZenFlow usa API Keys para autenticar las peticiones. Puedes administra
 6. Copia tu API key inmediatamente - no se mostrara de nuevo
 
 <Warning>
-  Guarda tu API key de forma segura. Nunca la guardes en control de versiones ni la expongas en codigo del lado del cliente.
+  Guarda tu API key de forma segura. Nunca la guardes en control de versiones ni
+  la expongas en codigo del lado del cliente.
 </Warning>
 
 ## Usar tu API Key
@@ -30,15 +31,15 @@ Incluye tu API key en el header `X-API-Key` en cada peticion:
 <CodeGroup>
 
 ```bash cURL
-curl -X GET "https://api.zenflow.com/api/v1/orders" \
+curl -X GET "https://api.zenflow.com.ar/api/v1/orders" \
   -H "X-API-Key: zenflow_live_abc123..."
 ```
 
 ```javascript Node.js
-const response = await fetch('https://api.zenflow.com/api/v1/orders', {
+const response = await fetch("https://api.zenflow.com.ar/api/v1/orders", {
   headers: {
-    'X-API-Key': 'zenflow_live_abc123...'
-  }
+    "X-API-Key": "zenflow_live_abc123...",
+  },
 });
 ```
 
@@ -46,7 +47,7 @@ const response = await fetch('https://api.zenflow.com/api/v1/orders', {
 import requests
 
 response = requests.get(
-    'https://api.zenflow.com/api/v1/orders',
+    'https://api.zenflow.com.ar/api/v1/orders',
     headers={'X-API-Key': 'zenflow_live_abc123...'}
 )
 ```
@@ -69,28 +70,28 @@ zenflow_test_<cadena_aleatoria>
 
 Las API keys tienen permisos especificos. Scopes disponibles:
 
-| Scope | Descripcion |
-|-------|-------------|
-| `read:orders` | Leer datos de pedidos |
-| `write:orders` | Crear y actualizar pedidos |
-| `read:products` | Leer catalogo de productos |
-| `write:products` | Crear y actualizar productos |
-| `read:stock` | Leer niveles de inventario |
-| `write:stock` | Actualizar inventario |
-| `read:webhooks` | Ver configuraciones de webhooks |
-| `write:webhooks` | Administrar webhooks |
-| `admin` | Acceso completo a todos los recursos |
+| Scope            | Descripcion                          |
+| ---------------- | ------------------------------------ |
+| `read:orders`    | Leer datos de pedidos                |
+| `write:orders`   | Crear y actualizar pedidos           |
+| `read:products`  | Leer catalogo de productos           |
+| `write:products` | Crear y actualizar productos         |
+| `read:stock`     | Leer niveles de inventario           |
+| `write:stock`    | Actualizar inventario                |
+| `read:webhooks`  | Ver configuraciones de webhooks      |
+| `write:webhooks` | Administrar webhooks                 |
+| `admin`          | Acceso completo a todos los recursos |
 
 ### Presets de Scopes
 
 Para casos de uso comunes, ofrecemos combinaciones predefinidas:
 
-| Preset | Scopes | Caso de Uso |
-|--------|--------|-------------|
-| Solo Lectura | `read:orders`, `read:products`, `read:stock` | Reportes y analiticas |
-| Sync ERP | `read:orders`, `write:orders`, `read:products`, `read:stock`, `write:stock` | Integracion ERP completa |
-| Sync Stock | `read:products`, `read:stock`, `write:stock` | Sincronizacion de inventario |
-| Acceso Total | `admin` | Acceso administrativo |
+| Preset       | Scopes                                                                      | Caso de Uso                  |
+| ------------ | --------------------------------------------------------------------------- | ---------------------------- |
+| Solo Lectura | `read:orders`, `read:products`, `read:stock`                                | Reportes y analiticas        |
+| Sync ERP     | `read:orders`, `write:orders`, `read:products`, `read:stock`, `write:stock` | Integracion ERP completa     |
+| Sync Stock   | `read:products`, `read:stock`, `write:stock`                                | Sincronizacion de inventario |
+| Acceso Total | `admin`                                                                     | Acceso administrativo        |
 
 ## Respuestas de Error
 
@@ -187,7 +188,8 @@ Para rotar una API key:
 4. Revoca la key antigua
 
 <Note>
-  Puedes tener multiples API keys activas. Esto permite rotacion sin tiempo de inactividad.
+  Puedes tener multiples API keys activas. Esto permite rotacion sin tiempo de
+  inactividad.
 </Note>
 
 ## Lista Blanca de IPs (Opcional)
@@ -201,10 +203,7 @@ Para seguridad adicional, puedes restringir el uso de API keys a direcciones IP 
 
 ```json
 {
-  "ip_whitelist": [
-    "192.168.1.100",
-    "10.0.0.0/24"
-  ]
+  "ip_whitelist": ["192.168.1.100", "10.0.0.0/24"]
 }
 ```
 

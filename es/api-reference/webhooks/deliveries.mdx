@@ -1,0 +1,105 @@
+---
+title: Obtener Historial de Entregas
+api: GET /api/v1/webhooks/{id}/deliveries
+description: "Ver historial de entregas del webhook"
+---
+
+# Obtener Historial de Entregas
+
+Obtén el historial de entregas de un webhook.
+
+<Note>Requiere scope `read:webhooks`.</Note>
+
+## Solicitud
+
+```bash
+GET /api/v1/webhooks/{id}/deliveries
+```
+
+### Parámetros de Ruta
+
+<ParamField path="id" type="string" required>
+  El ID del webhook
+</ParamField>
+
+### Parámetros de Consulta
+
+<ParamField query="page" type="integer" default="1">
+  Número de página
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Items por página
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filtrar por estado: `pending`, `success`, `failed`, `retrying`
+</ParamField>
+
+<ParamField query="event_type" type="string">
+  Filtrar por tipo de evento
+</ParamField>
+
+<ParamField query="start_date" type="string">
+  Filtrar desde fecha
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  Filtrar hasta fecha
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/webhooks/wh_abc123/deliveries?status=failed" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "deliveries": [
+      {
+        "id": "del_xyz789",
+        "event_type": "order.created",
+        "event_id": "evt_abc123",
+        "status": "success",
+        "response_status": 200,
+        "response_time_ms": 245,
+        "attempt_count": 1,
+        "delivered_at": "2024-01-14T15:30:00Z",
+        "created_at": "2024-01-14T15:30:00Z"
+      },
+      {
+        "id": "del_xyz788",
+        "event_type": "order.updated",
+        "event_id": "evt_abc122",
+        "status": "failed",
+        "response_status": 500,
+        "response_time_ms": 1500,
+        "attempt_count": 4,
+        "last_error": "Internal Server Error",
+        "created_at": "2024-01-14T14:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 50,
+      "total": 150,
+      "total_pages": 3
+    }
+  }
+}
+```
+
+## Estados de Entrega
+
+| Estado     | Descripción                              |
+| ---------- | ---------------------------------------- |
+| `pending`  | Esperando entrega                        |
+| `success`  | Entregado exitosamente (respuesta 2xx)   |
+| `failed`   | Todos los intentos de reintento agotados |
+| `retrying` | Programado para reintento                |

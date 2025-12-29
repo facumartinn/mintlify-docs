@@ -1,0 +1,186 @@
+---
+title: List Orders
+api: GET /api/v1/orders
+description: "Retrieve a paginated list of orders with optional filters"
+---
+
+# List Orders
+
+Retrieve a list of orders for your tenant with optional filtering and pagination.
+
+<Note>Requires `read:orders` scope.</Note>
+
+## Request
+
+```bash
+GET /api/v1/orders
+```
+
+### Query Parameters
+
+<ParamField query="page" type="integer" default="1">
+  Page number for pagination
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Number of orders per page (max 100)
+</ParamField>
+
+<ParamField query="state_id" type="integer | integer[]">
+  Filter by order state ID(s)
+</ParamField>
+
+<ParamField query="start_date" type="string">
+  Filter orders created on or after this date (YYYY-MM-DD)
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  Filter orders created on or before this date (YYYY-MM-DD)
+</ParamField>
+
+<ParamField query="assembly_date" type="string">
+  Filter by assembly/ship date (YYYY-MM-DD)
+</ParamField>
+
+<ParamField query="include_details" type="boolean" default="false">
+  Include order line items in response
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the request was successful
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="orders" type="array">
+      Array of order objects
+    </ResponseField>
+    <ResponseField name="pagination" type="object">
+      <Expandable title="properties">
+        <ResponseField name="total" type="integer">
+          Total number of orders matching filters
+        </ResponseField>
+        <ResponseField name="page" type="integer">
+          Current page number
+        </ResponseField>
+        <ResponseField name="limit" type="integer">
+          Items per page
+        </ResponseField>
+        <ResponseField name="total_pages" type="integer">
+          Total number of pages
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Examples
+
+### Basic Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.zenflow.com.ar/api/v1/orders?page=1&limit=20" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+```javascript Node.js
+const response = await fetch(
+  "https://api.zenflow.com.ar/api/v1/orders?page=1&limit=20",
+  {
+    headers: {
+      "X-API-Key": "zenflow_live_your_key",
+    },
+  }
+);
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://api.zenflow.com.ar/api/v1/orders',
+    params={'page': 1, 'limit': 20},
+    headers={'X-API-Key': 'zenflow_live_your_key'}
+)
+data = response.json()
+```
+
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "orders": [
+      {
+        "id": 12345,
+        "order_tenant_id": "ORD-001",
+        "state_id": 1,
+        "state_name": "Pending",
+        "assembly_date": "2024-01-15",
+        "customer_name": "John Doe",
+        "items_count": 3,
+        "created_at": "2024-01-14T10:30:00Z",
+        "updated_at": "2024-01-14T10:30:00Z"
+      },
+      {
+        "id": 12346,
+        "order_tenant_id": "ORD-002",
+        "state_id": 2,
+        "state_name": "In Progress",
+        "assembly_date": "2024-01-15",
+        "customer_name": "Jane Smith",
+        "items_count": 1,
+        "created_at": "2024-01-14T11:00:00Z",
+        "updated_at": "2024-01-14T14:30:00Z"
+      }
+    ],
+    "pagination": {
+      "total": 150,
+      "page": 1,
+      "limit": 20,
+      "total_pages": 8
+    }
+  }
+}
+```
+
+### With Filters
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/orders?state_id=1&state_id=2&start_date=2024-01-01&include_details=true" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+## Error Responses
+
+### 401 Unauthorized
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "invalid_api_key",
+    "message": "The API key provided is invalid"
+  }
+}
+```
+
+### 403 Forbidden
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "insufficient_scope",
+    "message": "This API key does not have the required scope: read:orders"
+  }
+}
+```

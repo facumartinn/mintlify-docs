@@ -1,0 +1,58 @@
+---
+title: Eliminar Webhook
+api: DELETE /api/v1/webhooks/{id}
+description: "Eliminar un webhook"
+---
+
+# Eliminar Webhook
+
+Elimina una configuración de webhook.
+
+<Note>Requiere scope `write:webhooks`.</Note>
+
+## Solicitud
+
+```bash
+DELETE /api/v1/webhooks/{id}
+```
+
+### Parámetros de Ruta
+
+<ParamField path="id" type="string" required>
+  El ID del webhook
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X DELETE "https://api.zenflow.com.ar/api/v1/webhooks/wh_abc123" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "message": "Webhook eliminado exitosamente"
+  }
+}
+```
+
+## Respuesta de Error
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "not_found",
+    "message": "Webhook no encontrado"
+  }
+}
+```
+
+<Warning>
+  Esta acción es permanente y no se puede deshacer. Todo el historial de
+  entregas de este webhook también será eliminado.
+</Warning>

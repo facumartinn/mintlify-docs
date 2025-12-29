@@ -1,0 +1,84 @@
+---
+title: Listar Eventos Disponibles
+api: GET /api/v1/webhooks/events
+description: "Obtener lista de eventos de webhook disponibles"
+---
+
+# Listar Eventos Disponibles
+
+Obtén una lista de todos los tipos de eventos de webhook disponibles.
+
+<Note>Requiere scope `read:webhooks`.</Note>
+
+## Solicitud
+
+```bash
+GET /api/v1/webhooks/events
+```
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.zenflow.com.ar/api/v1/webhooks/events" \
+  -H "X-API-Key: zenflow_live_your_key"
+```
+
+### Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "events": [
+      "order.created",
+      "order.updated",
+      "order.cancelled",
+      "order.completed",
+      "product.created",
+      "product.updated",
+      "product.deleted",
+      "stock.updated",
+      "stock.low_alert",
+      "stock.movement_created",
+      "flow.started",
+      "flow.completed",
+      "flow.cancelled"
+    ]
+  }
+}
+```
+
+## Categorías de Eventos
+
+### Eventos de Pedidos
+
+| Evento            | Disparador                               |
+| ----------------- | ---------------------------------------- |
+| `order.created`   | Se crea un nuevo pedido                  |
+| `order.updated`   | Cambian los detalles o estado del pedido |
+| `order.cancelled` | Se cancela el pedido                     |
+| `order.completed` | Se completa el fulfillment del pedido    |
+
+### Eventos de Productos
+
+| Evento            | Disparador                        |
+| ----------------- | --------------------------------- |
+| `product.created` | Se agrega un nuevo producto       |
+| `product.updated` | Cambian los detalles del producto |
+| `product.deleted` | Se desactiva el producto          |
+
+### Eventos de Stock
+
+| Evento                   | Disparador                         |
+| ------------------------ | ---------------------------------- |
+| `stock.updated`          | Cambia el nivel de stock           |
+| `stock.low_alert`        | El stock cae por debajo del mínimo |
+| `stock.movement_created` | Se registra un movimiento de stock |
+
+### Eventos de Flujo
+
+| Evento           | Disparador                     |
+| ---------------- | ------------------------------ |
+| `flow.started`   | Comienza el flujo de picking   |
+| `flow.completed` | Termina el flujo de picking    |
+| `flow.cancelled` | Se cancela el flujo de picking |

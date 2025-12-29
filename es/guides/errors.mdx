@@ -1,0 +1,263 @@
+---
+title: Manejo de Errores
+description: "Entendiendo y manejando errores de la API"
+---
+
+# Manejo de Errores
+
+La API de ZenFlow usa códigos de estado HTTP estándar y retorna información detallada de errores en formato JSON.
+
+## Formato de Respuesta de Error
+
+Todos los errores siguen esta estructura:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "codigo_error",
+    "message": "Mensaje de error legible",
+    "details": {} // Información adicional opcional
+  }
+}
+```
+
+## Códigos de Estado HTTP
+
+| Código | Descripción       | Cuándo Ocurre                              |
+| ------ | ----------------- | ------------------------------------------ |
+| 400    | Bad Request       | Cuerpo de solicitud o parámetros inválidos |
+| 401    | Unauthorized      | API key faltante o inválida                |
+| 403    | Forbidden         | Key válida pero permisos insuficientes     |
+| 404    | Not Found         | El recurso no existe                       |
+| 409    | Conflict          | El recurso ya existe                       |
+| 422    | Unprocessable     | Validación fallida                         |
+| 429    | Too Many Requests | Límite de tasa excedido                    |
+| 500    | Internal Error    | Error del servidor                         |
+
+## Códigos de Error Comunes
+
+### Errores de Autenticación
+
+| Código            | Mensaje              | Resolución                   |
+| ----------------- | -------------------- | ---------------------------- |
+| `missing_api_key` | API key es requerida | Agrega el header `X-API-Key` |
+| `invalid_api_key` | API key es inválida  | Verifica tu API key          |
+| `expired_api_key` | API key ha expirado  | Crea una nueva API key       |
+| `revoked_api_key` | API key fue revocada | Crea una nueva API key       |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "invalid_api_key",
+    "message": "La API key proporcionada es inválida o ha sido revocada"
+  }
+}
+```
+
+### Errores de Autorización
+
+| Código               | Mensaje                 | Resolución                    |
+| -------------------- | ----------------------- | ----------------------------- |
+| `insufficient_scope` | Falta scope requerido   | Usa key con scopes apropiados |
+| `ip_not_allowed`     | IP no está en whitelist | Agrega tu IP a la whitelist   |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "insufficient_scope",
+    "message": "Esta API key no tiene el scope requerido: write:orders"
+  }
+}
+```
+
+### Errores de Validación
+
+| Código             | Mensaje                  | Resolución                    |
+| ------------------ | ------------------------ | ----------------------------- |
+| `validation_error` | Valor de campo inválido  | Revisa el campo `details`     |
+| `invalid_id`       | Formato de ID incorrecto | Usa el formato de ID correcto |
+| `missing_field`    | Campo requerido faltante | Incluye los campos requeridos |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "validation_error",
+    "message": "Datos de pedido inválidos",
+    "details": [
+      {
+        "field": "assembly_date",
+        "message": "Debe ser una fecha válida en formato YYYY-MM-DD"
+      },
+      {
+        "field": "order_detail",
+        "message": "Se requiere al menos un item"
+      }
+    ]
+  }
+}
+```
+
+### Errores de Recurso
+
+| Código           | Mensaje               | Resolución                     |
+| ---------------- | --------------------- | ------------------------------ |
+| `not_found`      | Recurso no encontrado | Verifica el ID del recurso     |
+| `already_exists` | Recurso ya existe     | Usa un identificador diferente |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "not_found",
+    "message": "Pedido no encontrado"
+  }
+}
+```
+
+### Límite de Tasa
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "rate_limit_exceeded",
+    "message": "Límite de tasa excedido. Intenta de nuevo en 30 segundos."
+  }
+}
+```
+
+Consulta [Límites de Tasa](/guides/rate-limits) para estrategias de manejo.
+
+## Manejando Errores
+
+### JavaScript/TypeScript
+
+```javascript
+async function createOrder(orderData) {
+  try {
+    const response = await fetch("/api/v1/orders", {
+      method: "POST",
+      headers: {
+        "X-API-Key": API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      switch (result.error.code) {
+        case "validation_error":
+          // Muestra errores de validación al usuario
+          console.error("Validación fallida:", result.error.details);
+          break;
+        case "already_exists":
+          // Maneja duplicado
+          console.error("El pedido ya existe");
+          break;
+        case "rate_limit_exceeded":
+          // Reintenta después de delay
+          await delay(30000);
+          return createOrder(orderData);
+        default:
+          console.error("Error de API:", result.error.message);
+      }
+      throw new Error(result.error.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    if (error.name === "TypeError") {
+      // Error de red
+      console.error("Error de red");
+    }
+    throw error;
+  }
+}
+```
+
+### Python
+
+```python
+import requests
+
+def create_order(order_data):
+    try:
+        response = requests.post(
+            'https://api.zenflow.com.ar/api/v1/orders',
+            headers={'X-API-Key': API_KEY},
+            json=order_data
+        )
+
+        result = response.json()
+
+        if not result.get('success'):
+            error = result.get('error', {})
+            code = error.get('code')
+
+            if code == 'validation_error':
+                print(f"Validación fallida: {error.get('details')}")
+            elif code == 'rate_limit_exceeded':
+                time.sleep(30)
+                return create_order(order_data)
+            else:
+                print(f"Error de API: {error.get('message')}")
+
+            raise Exception(error.get('message'))
+
+        return result.get('data')
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error de red: {e}")
+        raise
+```
+
+## Mejores Prácticas
+
+<CardGroup cols={2}>
+  <Card title="Verifica el Campo success" icon="check">
+    Siempre verifica el campo `success` en las respuestas
+  </Card>
+  <Card title="Registra Códigos de Error" icon="file-lines">
+    Registra códigos de error para debugging y monitoreo
+  </Card>
+  <Card title="Maneja Reintentos" icon="rotate">
+    Implementa lógica de reintentos para errores transitorios
+  </Card>
+  <Card title="Mensajes al Usuario" icon="message">
+    Muestra mensajes amigables para errores de validación
+  </Card>
+</CardGroup>
+
+### Estrategia de Reintentos
+
+Reintenta estos errores con backoff exponencial:
+
+- `429` Límite de tasa excedido
+- `500` Error interno del servidor
+- `503` Servicio no disponible
+- Timeouts de red
+
+No reintentes estos errores:
+
+- `400` Bad request (corrige la solicitud primero)
+- `401` Unauthorized (corrige la autenticación)
+- `403` Forbidden (verifica permisos)
+- `404` Not found (el recurso no existe)
+
+## Obteniendo Ayuda
+
+Si encuentras errores persistentes:
+
+1. Revisa el código y mensaje de error
+2. Revisa la documentación de la API
+3. Verifica el [estado del servicio](https://status.zenflow.com)
+4. Contacta a [support@zenflow.com](mailto:support@zenflow.com) con:
+   - Código y mensaje de error
+   - Detalles de la solicitud (endpoint, método)
+   - Timestamp del error
