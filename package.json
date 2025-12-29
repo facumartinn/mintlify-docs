@@ -8,5 +8,8 @@
   },
   "devDependencies": {
     "mintlify": "^4.0.0"
+  },
+  "dependencies": {
+    "mint": "^4.2.255"
   }
 }
