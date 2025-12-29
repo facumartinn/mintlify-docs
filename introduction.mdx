@@ -1,0 +1,132 @@
+---
+title: Introduction
+description: 'Welcome to the ZenFlow API documentation'
+---
+
+# ZenFlow API
+
+ZenFlow is a warehouse management system (WMS) that provides a powerful API for integrating with ERP systems, e-commerce platforms, and other business applications.
+
+## What you can do with our API
+
+<CardGroup cols={2}>
+  <Card
+    title="Orders Management"
+    icon="box"
+    href="/api-reference/orders/list"
+  >
+    Create, update, and track orders through your fulfillment process
+  </Card>
+  <Card
+    title="Products Catalog"
+    icon="barcode"
+    href="/api-reference/products/list"
+  >
+    Synchronize your product catalog with ZenFlow
+  </Card>
+  <Card
+    title="Stock Control"
+    icon="warehouse"
+    href="/api-reference/stock/levels"
+  >
+    Real-time inventory levels and stock movements
+  </Card>
+  <Card
+    title="Webhooks"
+    icon="webhook"
+    href="/guides/webhooks"
+  >
+    Get notified when important events happen
+  </Card>
+</CardGroup>
+
+## Integrations
+
+ZenFlow integrates with major e-commerce platforms:
+
+<CardGroup cols={2}>
+  <Card
+    title="Mercado Libre"
+    icon="store"
+    href="/integrations/mercadolibre"
+  >
+    Sync orders and stock with Mercado Libre
+  </Card>
+  <Card
+    title="Tiendanube"
+    icon="cloud"
+    href="/integrations/tiendanube"
+  >
+    Connect your Tiendanube store
+  </Card>
+</CardGroup>
+
+## Base URL
+
+All API requests should be made to:
+
+```
+https://api.zenflow.com/api/v1
+```
+
+## Authentication
+
+ZenFlow API uses API Keys for authentication. Include your API key in the `X-API-Key` header:
+
+```bash
+curl -X GET "https://api.zenflow.com/api/v1/orders" \
+  -H "X-API-Key: zenflow_live_your_api_key_here"
+```
+
+<Note>
+  API keys are scoped to specific permissions. Make sure your key has the required scopes for the endpoints you want to use.
+</Note>
+
+## Response Format
+
+All responses are returned in JSON format with a consistent structure:
+
+### Success Response
+
+```json
+{
+  "success": true,
+  "data": {
+    // Response data here
+  }
+}
+```
+
+### Error Response
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "error_code",
+    "message": "Human readable error message"
+  }
+}
+```
+
+## Rate Limits
+
+API requests are rate limited based on your API key configuration:
+
+| Limit Type | Default |
+|------------|---------|
+| Per Minute | 60 requests |
+| Per Hour | 1,000 requests |
+| Per Day | 10,000 requests |
+
+Rate limit headers are included in all responses:
+
+- `X-RateLimit-Limit`: Maximum requests allowed
+- `X-RateLimit-Remaining`: Requests remaining
+- `X-RateLimit-Reset`: Unix timestamp when the limit resets
+
+## Need Help?
+
+- Check out our [guides](/guides/erp-integration) for common integration patterns
+- Browse the [API reference](/api-reference/overview) for detailed endpoint documentation
+- Contact [support@zenflow.com](mailto:support@zenflow.com) for assistance

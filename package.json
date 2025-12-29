@@ -1,0 +1,12 @@
+{
+  "name": "zenflow-docs",
+  "version": "1.0.0",
+  "description": "ZenFlow API Documentation",
+  "scripts": {
+    "dev": "mintlify dev",
+    "build": "mintlify build"
+  },
+  "devDependencies": {
+    "mintlify": "^4.0.0"
+  }
+}

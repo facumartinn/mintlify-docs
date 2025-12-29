@@ -1,0 +1,224 @@
+---
+title: Create Orders
+api: POST /api/v1/orders
+description: 'Create one or multiple orders'
+---
+
+# Create Orders
+
+Create one or multiple orders for fulfillment.
+
+<Note>
+  Requires `write:orders` scope.
+</Note>
+
+## Request
+
+```bash
+POST /api/v1/orders
+```
+
+### Body Parameters
+
+You can send a single order or an array of orders.
+
+<ParamField body="order_tenant_id" type="string" required>
+  Your unique order identifier (used for idempotency)
+</ParamField>
+
+<ParamField body="assembly_date" type="string" required>
+  Date when the order should be fulfilled (YYYY-MM-DD)
+</ParamField>
+
+<ParamField body="customer_name" type="string">
+  Customer name
+</ParamField>
+
+<ParamField body="shipping_address" type="string">
+  Shipping address
+</ParamField>
+
+<ParamField body="order_detail" type="array" required>
+  Array of order line items
+  <Expandable title="item properties">
+    <ParamField body="barcode" type="string" required>
+      Product barcode
+    </ParamField>
+    <ParamField body="quantity" type="integer" required>
+      Quantity to fulfill
+    </ParamField>
+    <ParamField body="price" type="number">
+      Unit price
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the request was successful
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="created_count" type="integer">
+      Number of orders created
+    </ResponseField>
+    <ResponseField name="existing_count" type="integer">
+      Number of orders that already existed (skipped)
+    </ResponseField>
+    <ResponseField name="orders" type="array">
+      Array of created order objects
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Examples
+
+### Single Order
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.zenflow.com/api/v1/orders" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "order_tenant_id": "ORD-001",
+    "assembly_date": "2024-01-15",
+    "customer_name": "John Doe",
+    "shipping_address": "123 Main St, City",
+    "order_detail": [
+      {
+        "barcode": "7891234567890",
+        "quantity": 2,
+        "price": 29.99
+      },
+      {
+        "barcode": "7891234567891",
+        "quantity": 1,
+        "price": 49.99
+      }
+    ]
+  }'
+```
+
+```javascript Node.js
+const response = await fetch('https://api.zenflow.com/api/v1/orders', {
+  method: 'POST',
+  headers: {
+    'X-API-Key': 'zenflow_live_your_key',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    order_tenant_id: 'ORD-001',
+    assembly_date: '2024-01-15',
+    customer_name: 'John Doe',
+    order_detail: [
+      { barcode: '7891234567890', quantity: 2 },
+      { barcode: '7891234567891', quantity: 1 }
+    ]
+  })
+});
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.zenflow.com/api/v1/orders',
+    headers={
+        'X-API-Key': 'zenflow_live_your_key',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'order_tenant_id': 'ORD-001',
+        'assembly_date': '2024-01-15',
+        'customer_name': 'John Doe',
+        'order_detail': [
+            {'barcode': '7891234567890', 'quantity': 2},
+            {'barcode': '7891234567891', 'quantity': 1}
+        ]
+    }
+)
+```
+
+</CodeGroup>
+
+### Multiple Orders
+
+```bash
+curl -X POST "https://api.zenflow.com/api/v1/orders" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "orders": [
+      {
+        "order_tenant_id": "ORD-001",
+        "assembly_date": "2024-01-15",
+        "order_detail": [{"barcode": "7891234567890", "quantity": 2}]
+      },
+      {
+        "order_tenant_id": "ORD-002",
+        "assembly_date": "2024-01-15",
+        "order_detail": [{"barcode": "7891234567891", "quantity": 1}]
+      }
+    ]
+  }'
+```
+
+### Success Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "created_count": 2,
+    "existing_count": 0,
+    "orders": [
+      {
+        "id": 12345,
+        "order_tenant_id": "ORD-001",
+        "state_id": 1
+      },
+      {
+        "id": 12346,
+        "order_tenant_id": "ORD-002",
+        "state_id": 1
+      }
+    ]
+  }
+}
+```
+
+## Error Responses
+
+### 400 Validation Error
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "validation_error",
+    "message": "Invalid order data",
+    "details": [
+      {
+        "index": 0,
+        "error": "assembly_date is required"
+      }
+    ]
+  }
+}
+```
+
+### 400 Product Not Found
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "creation_error",
+    "message": "Product with barcode 7891234567890 not found"
+  }
+}
+```

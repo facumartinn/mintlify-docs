@@ -1,0 +1,101 @@
+---
+title: Bulk Update Stock
+api: POST /api/v1/stock/bulk
+description: 'Update stock levels for multiple products'
+---
+
+# Bulk Update Stock
+
+Update stock levels for multiple products in a single request.
+
+<Note>
+  Requires `write:stock` scope.
+</Note>
+
+## Request
+
+```bash
+POST /api/v1/stock/bulk
+```
+
+### Body Parameters
+
+<ParamField body="updates" type="array" required>
+  Array of stock updates
+  <Expandable title="update properties">
+    <ParamField body="product_id" type="integer">
+      Product ID (or use sku)
+    </ParamField>
+    <ParamField body="sku" type="string">
+      Product SKU (alternative to product_id)
+    </ParamField>
+    <ParamField body="location_id" type="string" required>
+      Location ID
+    </ParamField>
+    <ParamField body="quantity" type="number" required>
+      New stock quantity
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Example
+
+```bash
+curl -X POST "https://api.zenflow.com/api/v1/stock/bulk" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "updates": [
+      {
+        "sku": "SKU-001",
+        "location_id": "LOC-A1",
+        "quantity": 100
+      },
+      {
+        "sku": "SKU-002",
+        "location_id": "LOC-A1",
+        "quantity": 50
+      },
+      {
+        "product_id": 103,
+        "location_id": "LOC-B1",
+        "quantity": 25
+      }
+    ]
+  }'
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": 3,
+    "errors": []
+  }
+}
+```
+
+### Response with Errors
+
+```json
+{
+  "success": true,
+  "data": {
+    "success": 2,
+    "errors": [
+      {
+        "product_id": 0,
+        "error": "Product with SKU INVALID-SKU not found"
+      }
+    ]
+  }
+}
+```
+
+## Best Practices
+
+- Batch updates in groups of 100 for optimal performance
+- Use SKU for matching if product IDs aren't available
+- The endpoint continues processing even if some items fail

@@ -1,0 +1,261 @@
+---
+title: Error Handling
+description: 'Understanding and handling API errors'
+---
+
+# Error Handling
+
+The ZenFlow API uses standard HTTP status codes and returns detailed error information in JSON format.
+
+## Error Response Format
+
+All errors follow this structure:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "error_code",
+    "message": "Human-readable error message",
+    "details": {} // Optional additional information
+  }
+}
+```
+
+## HTTP Status Codes
+
+| Code | Description | When It Occurs |
+|------|-------------|----------------|
+| 400 | Bad Request | Invalid request body or parameters |
+| 401 | Unauthorized | Missing or invalid API key |
+| 403 | Forbidden | Valid key but insufficient permissions |
+| 404 | Not Found | Resource doesn't exist |
+| 409 | Conflict | Resource already exists |
+| 422 | Unprocessable | Validation failed |
+| 429 | Too Many Requests | Rate limit exceeded |
+| 500 | Internal Error | Server-side error |
+
+## Common Error Codes
+
+### Authentication Errors
+
+| Code | Message | Resolution |
+|------|---------|------------|
+| `missing_api_key` | API key is required | Add `X-API-Key` header |
+| `invalid_api_key` | API key is invalid | Check your API key |
+| `expired_api_key` | API key has expired | Create a new API key |
+| `revoked_api_key` | API key was revoked | Create a new API key |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "invalid_api_key",
+    "message": "The API key provided is invalid or has been revoked"
+  }
+}
+```
+
+### Authorization Errors
+
+| Code | Message | Resolution |
+|------|---------|------------|
+| `insufficient_scope` | Missing required scope | Use key with proper scopes |
+| `ip_not_allowed` | IP not in whitelist | Add your IP to whitelist |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "insufficient_scope",
+    "message": "This API key does not have the required scope: write:orders"
+  }
+}
+```
+
+### Validation Errors
+
+| Code | Message | Resolution |
+|------|---------|------------|
+| `validation_error` | Invalid field value | Check the `details` field |
+| `invalid_id` | ID format is wrong | Use correct ID format |
+| `missing_field` | Required field missing | Include required fields |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "validation_error",
+    "message": "Invalid order data",
+    "details": [
+      {
+        "field": "assembly_date",
+        "message": "Must be a valid date in YYYY-MM-DD format"
+      },
+      {
+        "field": "order_detail",
+        "message": "At least one item is required"
+      }
+    ]
+  }
+}
+```
+
+### Resource Errors
+
+| Code | Message | Resolution |
+|------|---------|------------|
+| `not_found` | Resource not found | Check the resource ID |
+| `already_exists` | Resource already exists | Use a different identifier |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "not_found",
+    "message": "Order not found"
+  }
+}
+```
+
+### Rate Limiting
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "rate_limit_exceeded",
+    "message": "Rate limit exceeded. Try again in 30 seconds."
+  }
+}
+```
+
+See [Rate Limits](/guides/rate-limits) for handling strategies.
+
+## Handling Errors
+
+### JavaScript/TypeScript
+
+```javascript
+async function createOrder(orderData) {
+  try {
+    const response = await fetch('/api/v1/orders', {
+      method: 'POST',
+      headers: {
+        'X-API-Key': API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderData)
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      switch (result.error.code) {
+        case 'validation_error':
+          // Show validation errors to user
+          console.error('Validation failed:', result.error.details);
+          break;
+        case 'already_exists':
+          // Handle duplicate
+          console.error('Order already exists');
+          break;
+        case 'rate_limit_exceeded':
+          // Retry after delay
+          await delay(30000);
+          return createOrder(orderData);
+        default:
+          console.error('API error:', result.error.message);
+      }
+      throw new Error(result.error.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    if (error.name === 'TypeError') {
+      // Network error
+      console.error('Network error');
+    }
+    throw error;
+  }
+}
+```
+
+### Python
+
+```python
+import requests
+
+def create_order(order_data):
+    try:
+        response = requests.post(
+            'https://api.zenflow.com/api/v1/orders',
+            headers={'X-API-Key': API_KEY},
+            json=order_data
+        )
+
+        result = response.json()
+
+        if not result.get('success'):
+            error = result.get('error', {})
+            code = error.get('code')
+
+            if code == 'validation_error':
+                print(f"Validation failed: {error.get('details')}")
+            elif code == 'rate_limit_exceeded':
+                time.sleep(30)
+                return create_order(order_data)
+            else:
+                print(f"API error: {error.get('message')}")
+
+            raise Exception(error.get('message'))
+
+        return result.get('data')
+
+    except requests.exceptions.RequestException as e:
+        print(f"Network error: {e}")
+        raise
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Check success Field" icon="check">
+    Always check the `success` field in responses
+  </Card>
+  <Card title="Log Error Codes" icon="file-lines">
+    Log error codes for debugging and monitoring
+  </Card>
+  <Card title="Handle Retries" icon="rotate">
+    Implement retry logic for transient errors
+  </Card>
+  <Card title="User Messages" icon="message">
+    Show user-friendly messages for validation errors
+  </Card>
+</CardGroup>
+
+### Retry Strategy
+
+Retry these errors with exponential backoff:
+- `429` Rate limit exceeded
+- `500` Internal server error
+- `503` Service unavailable
+- Network timeouts
+
+Don't retry these errors:
+- `400` Bad request (fix the request first)
+- `401` Unauthorized (fix authentication)
+- `403` Forbidden (check permissions)
+- `404` Not found (resource doesn't exist)
+
+## Getting Help
+
+If you encounter persistent errors:
+
+1. Check the error code and message
+2. Review the API documentation
+3. Check [service status](https://status.zenflow.com)
+4. Contact [support@zenflow.com](mailto:support@zenflow.com) with:
+   - Error code and message
+   - Request details (endpoint, method)
+   - Timestamp of the error

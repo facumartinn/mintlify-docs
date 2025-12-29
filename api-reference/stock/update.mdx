@@ -1,0 +1,93 @@
+---
+title: Update Product Stock
+api: PUT /api/v1/stock/product/{productId}
+description: 'Set stock level for a product at a location'
+---
+
+# Update Product Stock
+
+Set the absolute stock quantity for a product at a specific location.
+
+<Note>
+  Requires `write:stock` scope.
+</Note>
+
+## Request
+
+```bash
+PUT /api/v1/stock/product/{productId}
+```
+
+### Path Parameters
+
+<ParamField path="productId" type="integer" required>
+  The product ID
+</ParamField>
+
+### Body Parameters
+
+<ParamField body="location_id" type="string" required>
+  The location ID
+</ParamField>
+
+<ParamField body="quantity" type="number" required>
+  The new stock quantity
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Reason for the adjustment
+</ParamField>
+
+## Example
+
+```bash
+curl -X PUT "https://api.zenflow.com/api/v1/stock/product/100" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location_id": "LOC-A1",
+    "quantity": 75,
+    "reason": "Inventory count adjustment"
+  }'
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "product_id": 100,
+    "location_id": "LOC-A1",
+    "previous_quantity": 50,
+    "new_quantity": 75,
+    "movement_id": "MOV-12345"
+  }
+}
+```
+
+## Error Responses
+
+### 400 Validation Error
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "validation_error",
+    "message": "Location ID is required"
+  }
+}
+```
+
+### 400 Invalid Quantity
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "validation_error",
+    "message": "Quantity is required and must be a number"
+  }
+}
+```

@@ -1,0 +1,132 @@
+---
+title: Introduccion
+description: 'Bienvenido a la documentacion de la API de ZenFlow'
+---
+
+# ZenFlow API
+
+ZenFlow es un sistema de gestion de almacenes (WMS) que proporciona una API potente para integrarse con sistemas ERP, plataformas de e-commerce y otras aplicaciones empresariales.
+
+## Que puedes hacer con nuestra API
+
+<CardGroup cols={2}>
+  <Card
+    title="Gestion de Pedidos"
+    icon="box"
+    href="/es/api-reference/orders/list"
+  >
+    Crear, actualizar y rastrear pedidos a traves de tu proceso de fulfillment
+  </Card>
+  <Card
+    title="Catalogo de Productos"
+    icon="barcode"
+    href="/es/api-reference/products/list"
+  >
+    Sincroniza tu catalogo de productos con ZenFlow
+  </Card>
+  <Card
+    title="Control de Stock"
+    icon="warehouse"
+    href="/es/api-reference/stock/levels"
+  >
+    Niveles de inventario y movimientos de stock en tiempo real
+  </Card>
+  <Card
+    title="Webhooks"
+    icon="webhook"
+    href="/es/guides/webhooks"
+  >
+    Recibe notificaciones cuando ocurran eventos importantes
+  </Card>
+</CardGroup>
+
+## Integraciones
+
+ZenFlow se integra con las principales plataformas de e-commerce:
+
+<CardGroup cols={2}>
+  <Card
+    title="Mercado Libre"
+    icon="store"
+    href="/es/integrations/mercadolibre"
+  >
+    Sincroniza pedidos y stock con Mercado Libre
+  </Card>
+  <Card
+    title="Tiendanube"
+    icon="cloud"
+    href="/es/integrations/tiendanube"
+  >
+    Conecta tu tienda de Tiendanube
+  </Card>
+</CardGroup>
+
+## URL Base
+
+Todas las peticiones a la API deben hacerse a:
+
+```
+https://api.zenflow.com/api/v1
+```
+
+## Autenticacion
+
+La API de ZenFlow usa API Keys para autenticacion. Incluye tu API key en el header `X-API-Key`:
+
+```bash
+curl -X GET "https://api.zenflow.com/api/v1/orders" \
+  -H "X-API-Key: zenflow_live_tu_api_key_aqui"
+```
+
+<Note>
+  Las API keys tienen permisos (scopes) especificos. Asegurate de que tu key tenga los scopes necesarios para los endpoints que quieres usar.
+</Note>
+
+## Formato de Respuesta
+
+Todas las respuestas se devuelven en formato JSON con una estructura consistente:
+
+### Respuesta Exitosa
+
+```json
+{
+  "success": true,
+  "data": {
+    // Datos de respuesta aqui
+  }
+}
+```
+
+### Respuesta de Error
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "codigo_error",
+    "message": "Mensaje de error legible"
+  }
+}
+```
+
+## Limites de Tasa (Rate Limits)
+
+Las peticiones a la API tienen limites basados en la configuracion de tu API key:
+
+| Tipo de Limite | Por Defecto |
+|----------------|-------------|
+| Por Minuto | 60 peticiones |
+| Por Hora | 1,000 peticiones |
+| Por Dia | 10,000 peticiones |
+
+Los headers de rate limit se incluyen en todas las respuestas:
+
+- `X-RateLimit-Limit`: Maximo de peticiones permitidas
+- `X-RateLimit-Remaining`: Peticiones restantes
+- `X-RateLimit-Reset`: Timestamp Unix cuando se reinicia el limite
+
+## Necesitas Ayuda?
+
+- Consulta nuestras [guias](/es/guides/erp-integration) para patrones de integracion comunes
+- Explora la [referencia de API](/es/api-reference/overview) para documentacion detallada de endpoints
+- Contacta a [support@zenflow.com](mailto:support@zenflow.com) para asistencia

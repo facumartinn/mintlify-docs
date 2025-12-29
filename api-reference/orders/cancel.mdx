@@ -1,0 +1,100 @@
+---
+title: Cancel Order
+api: POST /api/v1/orders/{id}/cancel
+description: 'Cancel an order'
+---
+
+# Cancel Order
+
+Cancel an existing order.
+
+<Note>
+  Requires `write:orders` scope.
+</Note>
+
+## Request
+
+```bash
+POST /api/v1/orders/{id}/cancel
+```
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The order ID or order_tenant_id
+</ParamField>
+
+### Body Parameters
+
+<ParamField body="order_tenant_id" type="string">
+  Alternative: your external order ID
+</ParamField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.zenflow.com/api/v1/orders/ORD-001/cancel" \
+  -H "X-API-Key: zenflow_live_your_key" \
+  -H "Content-Type: application/json"
+```
+
+```javascript Node.js
+const response = await fetch(
+  'https://api.zenflow.com/api/v1/orders/ORD-001/cancel',
+  {
+    method: 'POST',
+    headers: { 'X-API-Key': 'zenflow_live_your_key' }
+  }
+);
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.zenflow.com/api/v1/orders/ORD-001/cancel',
+    headers={'X-API-Key': 'zenflow_live_your_key'}
+)
+```
+
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "message": "Order cancelled successfully",
+    "order_id": "ORD-001"
+  }
+}
+```
+
+## Error Responses
+
+### 404 Not Found
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "not_found",
+    "message": "Order not found"
+  }
+}
+```
+
+### 400 Cannot Cancel
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "cancel_error",
+    "message": "Cannot cancel order that is already completed"
+  }
+}
+```

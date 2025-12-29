@@ -1,0 +1,193 @@
+---
+title: Rate Limits
+description: 'Understanding API rate limits and how to handle them'
+---
+
+# Rate Limits
+
+To ensure fair usage and system stability, the ZenFlow API enforces rate limits on all requests.
+
+## Default Limits
+
+| Time Window | Limit |
+|-------------|-------|
+| Per Minute | 60 requests |
+| Per Hour | 1,000 requests |
+| Per Day | 10,000 requests |
+
+<Note>
+  Rate limits are per API key. You can request higher limits by contacting support.
+</Note>
+
+## Rate Limit Headers
+
+Every API response includes rate limit information:
+
+```
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 45
+X-RateLimit-Reset: 1705312260
+```
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum requests in current window |
+| `X-RateLimit-Remaining` | Requests remaining |
+| `X-RateLimit-Reset` | Unix timestamp when limit resets |
+
+## Rate Limit Exceeded
+
+When you exceed the rate limit, the API returns:
+
+```json
+HTTP/1.1 429 Too Many Requests
+Retry-After: 30
+
+{
+  "success": false,
+  "error": {
+    "code": "rate_limit_exceeded",
+    "message": "Rate limit exceeded. Try again in 30 seconds."
+  }
+}
+```
+
+The `Retry-After` header indicates seconds to wait before retrying.
+
+## Handling Rate Limits
+
+### Exponential Backoff
+
+Implement exponential backoff for rate limit errors:
+
+<CodeGroup>
+
+```javascript Node.js
+async function fetchWithRetry(url, options, maxRetries = 3) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const response = await fetch(url, options);
+
+    if (response.status !== 429) {
+      return response;
+    }
+
+    const retryAfter = parseInt(response.headers.get('Retry-After') || '1');
+    const delay = Math.min(retryAfter * 1000, Math.pow(2, attempt) * 1000);
+
+    console.log(`Rate limited. Retrying in ${delay}ms...`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+
+  throw new Error('Max retries exceeded');
+}
+```
+
+```python Python
+import time
+import requests
+
+def fetch_with_retry(url, headers, max_retries=3):
+    for attempt in range(max_retries + 1):
+        response = requests.get(url, headers=headers)
+
+        if response.status_code != 429:
+            return response
+
+        retry_after = int(response.headers.get('Retry-After', 1))
+        delay = min(retry_after, 2 ** attempt)
+
+        print(f"Rate limited. Retrying in {delay}s...")
+        time.sleep(delay)
+
+    raise Exception("Max retries exceeded")
+```
+
+</CodeGroup>
+
+### Check Remaining Requests
+
+Before making requests, check remaining quota:
+
+```javascript
+async function makeRequest(url) {
+  const response = await fetch(url, { headers });
+
+  const remaining = parseInt(response.headers.get('X-RateLimit-Remaining'));
+
+  if (remaining < 10) {
+    console.warn('Low rate limit remaining:', remaining);
+    // Optionally slow down requests
+  }
+
+  return response;
+}
+```
+
+### Request Batching
+
+For bulk operations, use batch endpoints instead of individual calls:
+
+```javascript
+// Bad: Individual requests (uses 100 API calls)
+for (const product of products) {
+  await updateStock(product.id, product.quantity);
+}
+
+// Good: Batch request (uses 1 API call)
+await bulkUpdateStock(products.map(p => ({
+  product_id: p.id,
+  quantity: p.quantity
+})));
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Use Batch Endpoints" icon="layer-group">
+    Combine multiple operations into single requests
+  </Card>
+  <Card title="Cache Responses" icon="database">
+    Cache data that doesn't change frequently
+  </Card>
+  <Card title="Implement Backoff" icon="clock">
+    Use exponential backoff for retries
+  </Card>
+  <Card title="Monitor Usage" icon="chart-line">
+    Track your API usage patterns
+  </Card>
+</CardGroup>
+
+### Caching Example
+
+```javascript
+const cache = new Map();
+const CACHE_TTL = 60000; // 1 minute
+
+async function getProduct(id) {
+  const cacheKey = `product:${id}`;
+  const cached = cache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  const response = await fetch(`/api/v1/products/${id}`, { headers });
+  const data = await response.json();
+
+  cache.set(cacheKey, { data: data.data, timestamp: Date.now() });
+  return data.data;
+}
+```
+
+## Custom Limits
+
+Need higher rate limits? Contact [support@zenflow.com](mailto:support@zenflow.com) with:
+
+- Your use case
+- Expected request volume
+- Peak usage patterns
+
+Enterprise plans include:
+- Higher default limits
+- Custom limit configuration
+- Dedicated support

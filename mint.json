@@ -1,0 +1,166 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "ZenFlow API",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#227CFB",
+    "light": "#559EFE",
+    "dark": "#0A56E3",
+    "background": {
+      "light": "#FFFFFF",
+      "dark": "#000000"
+    },
+    "anchors": {
+      "from": "#227CFB",
+      "to": "#0A56E3"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Support",
+      "url": "mailto:support@zenflow.com"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Dashboard",
+    "url": "https://app.zenflow.com"
+  },
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    },
+    {
+      "name": "Integrations",
+      "url": "integrations"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/zenflow"
+    },
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.gg/zenflow"
+    }
+  ],
+  "i18n": {
+    "defaultLocale": "en",
+    "locales": ["en", "es"],
+    "localeConfigs": {
+      "en": {
+        "label": "English",
+        "path": ""
+      },
+      "es": {
+        "label": "Español",
+        "path": "es"
+      }
+    }
+  },
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "authentication"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "guides/erp-integration",
+        "guides/webhooks",
+        "guides/rate-limits",
+        "guides/errors"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/overview"
+      ]
+    },
+    {
+      "group": "Orders",
+      "pages": [
+        "api-reference/orders/list",
+        "api-reference/orders/get",
+        "api-reference/orders/create",
+        "api-reference/orders/update",
+        "api-reference/orders/cancel",
+        "api-reference/orders/status"
+      ]
+    },
+    {
+      "group": "Products",
+      "pages": [
+        "api-reference/products/list",
+        "api-reference/products/get",
+        "api-reference/products/get-by-sku",
+        "api-reference/products/get-by-barcode",
+        "api-reference/products/create",
+        "api-reference/products/update",
+        "api-reference/products/bulk-upsert",
+        "api-reference/products/delete"
+      ]
+    },
+    {
+      "group": "Stock",
+      "pages": [
+        "api-reference/stock/levels",
+        "api-reference/stock/product",
+        "api-reference/stock/by-sku",
+        "api-reference/stock/update",
+        "api-reference/stock/bulk-update",
+        "api-reference/stock/movements",
+        "api-reference/stock/adjustment"
+      ]
+    },
+    {
+      "group": "Webhooks",
+      "pages": [
+        "api-reference/webhooks/overview",
+        "api-reference/webhooks/events",
+        "api-reference/webhooks/list",
+        "api-reference/webhooks/get",
+        "api-reference/webhooks/create",
+        "api-reference/webhooks/update",
+        "api-reference/webhooks/delete",
+        "api-reference/webhooks/rotate-secret",
+        "api-reference/webhooks/toggle",
+        "api-reference/webhooks/deliveries",
+        "api-reference/webhooks/stats",
+        "api-reference/webhooks/test"
+      ]
+    },
+    {
+      "group": "Integrations",
+      "pages": [
+        "integrations/overview",
+        "integrations/mercadolibre",
+        "integrations/tiendanube"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "twitter": "https://twitter.com/zenflow",
+    "github": "https://github.com/zenflow",
+    "linkedin": "https://www.linkedin.com/company/zenflow"
+  },
+  "api": {
+    "baseUrl": "https://api.zenflow.com",
+    "auth": {
+      "method": "key",
+      "name": "X-API-Key"
+    }
+  }
+}
