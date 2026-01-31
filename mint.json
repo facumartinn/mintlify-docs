@@ -115,7 +115,8 @@
       "pages": [
         "en/integrations/overview",
         "en/integrations/mercadolibre",
-        "en/integrations/tiendanube"
+        "en/integrations/tiendanube",
+        "en/integrations/shopify"
       ]
     },
     {
@@ -193,7 +194,8 @@
       "pages": [
         "es/integrations/overview",
         "es/integrations/mercadolibre",
-        "es/integrations/tiendanube"
+        "es/integrations/tiendanube",
+        "es/integrations/shopify"
       ]
     }
   ],

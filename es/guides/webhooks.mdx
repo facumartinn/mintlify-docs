@@ -7,109 +7,448 @@ description: "Recibe notificaciones en tiempo real cuando ocurren eventos en Zen
 
 Los webhooks permiten que tu aplicación reciba notificaciones HTTP en tiempo real cuando ocurren eventos en ZenFlow. En lugar de consultar la API constantemente, los webhooks envían datos a tu servidor tan pronto como algo sucede.
 
-## Cómo Funcionan los Webhooks
+## Cómo Funcionan
 
 ```mermaid
 sequenceDiagram
     participant ZF as ZenFlow
-    participant WH as Tu URL de Webhook
-    participant App as Tu Aplicación
+    participant WH as Tu Servidor
 
     ZF->>WH: POST payload del evento
-    WH->>App: Procesar evento
-    App->>WH: Retornar 200 OK
-    WH->>ZF: Confirmar recepción
+    WH->>ZF: 200 OK
+    Note over WH: Procesar async
 ```
 
-1. Ocurre un evento en ZenFlow (ej., pedido creado)
-2. ZenFlow envía un HTTP POST a tu URL de webhook
-3. Tu servidor procesa el evento
-4. Tu servidor responde con código de estado 2xx
-5. Si la entrega falla, ZenFlow reintenta con backoff exponencial
+1. Te suscribes a uno o más **topics** (eventos)
+2. Cuando ocurre un evento, ZenFlow envía un POST a tu URL
+3. Tu servidor responde con `2xx` para confirmar recepción
+4. Si falla, ZenFlow reintenta con backoff exponencial
 
-## Eventos Disponibles
+## Suscribirse a Webhooks
 
-### Eventos de Pedidos
+Para recibir notificaciones, crea un webhook especificando tu URL y los eventos que te interesan:
 
-| Evento            | Descripción                       |
-| ----------------- | --------------------------------- |
-| `order.created`   | Nuevo pedido creado               |
-| `order.updated`   | Detalles del pedido modificados   |
-| `order.cancelled` | Pedido cancelado                  |
-| `order.completed` | Fulfillment del pedido completado |
-
-### Eventos de Productos
-
-| Evento            | Descripción                       |
-| ----------------- | --------------------------------- |
-| `product.created` | Nuevo producto agregado           |
-| `product.updated` | Detalles del producto modificados |
-| `product.deleted` | Producto eliminado                |
-
-### Eventos de Stock
-
-| Evento                   | Descripción                        |
-| ------------------------ | ---------------------------------- |
-| `stock.updated`          | Nivel de stock modificado          |
-| `stock.low_alert`        | Stock por debajo del umbral mínimo |
-| `stock.movement_created` | Movimiento de stock registrado     |
-
-### Eventos de Flujo
-
-| Evento           | Descripción                 |
-| ---------------- | --------------------------- |
-| `flow.started`   | Flujo de picking iniciado   |
-| `flow.completed` | Flujo de picking completado |
-| `flow.cancelled` | Flujo de picking cancelado  |
-
-## Creando un Webhook
-
-<CodeGroup>
-
-```bash cURL
-curl -X POST "https://api.zenflow.com.ar/api/v1/webhooks" \
-  -H "X-API-Key: zenflow_live_your_key" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Notificaciones de Pedidos",
-    "url": "https://tu-servidor.com/webhooks/zenflow",
-    "events": ["order.created", "order.updated", "order.completed"]
-  }'
+```bash
+POST /api/v1/webhooks
 ```
 
-```javascript Node.js
-const response = await fetch("https://api.zenflow.com.ar/api/v1/webhooks", {
-  method: "POST",
-  headers: {
-    "X-API-Key": "zenflow_live_your_key",
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    name: "Notificaciones de Pedidos",
-    url: "https://tu-servidor.com/webhooks/zenflow",
-    events: ["order.created", "order.updated", "order.completed"],
-  }),
-});
-
-const data = await response.json();
-console.log("Secret del webhook:", data.data.secret);
+```json
+{
+  "name": "Mis notificaciones",
+  "url": "https://tu-servidor.com/webhooks/zenflow",
+  "events": ["order/created", "order/updated", "stock/updated"]
+}
 ```
-
-</CodeGroup>
 
 <Warning>
-  Guarda el secret del webhook devuelto en la respuesta. Lo necesitarás para
-  verificar las firmas de los webhooks. No se mostrará nuevamente.
+  Guarda el `secret` devuelto en la respuesta. Lo necesitarás para verificar las firmas. No se mostrará nuevamente.
 </Warning>
 
-## Payload del Webhook
+---
 
-Todos los payloads de webhook siguen esta estructura:
+## Topics Disponibles
+
+### Pedidos (Orders)
+
+<Accordion title="order/created">
+Se dispara cuando se crea un nuevo pedido en ZenFlow.
+
+**Payload:**
+```json
+{
+  "id": "evt_abc123",
+  "event": "order/created",
+  "created_at": "2024-01-15T10:30:00Z",
+  "data": {
+    "order_id": 12345,
+    "order_tenant_id": "ORD-001",
+    "state_id": 1,
+    "state_name": "Pendiente",
+    "warehouse_id": 1,
+    "warehouse_name": "Depósito Central",
+    "items_count": 5,
+    "total_quantity": 12,
+    "source": "api",
+    "source_integration": null,
+    "created_at": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `order_id` | integer | ID interno del pedido |
+| `order_tenant_id` | string | ID del pedido en tu sistema |
+| `state_id` | integer | ID del estado actual |
+| `state_name` | string | Nombre del estado |
+| `warehouse_id` | integer | ID del almacén asignado |
+| `items_count` | integer | Cantidad de líneas/productos |
+| `total_quantity` | integer | Cantidad total de unidades |
+| `source` | string | Origen: `api`, `integration`, `manual` |
+| `source_integration` | string | Integración origen (si aplica) |
+</Accordion>
+
+<Accordion title="order/updated">
+Se dispara cuando se modifican los detalles de un pedido (estado, items, etc).
+
+**Payload:**
+```json
+{
+  "id": "evt_def456",
+  "event": "order/updated",
+  "created_at": "2024-01-15T11:00:00Z",
+  "data": {
+    "order_id": 12345,
+    "order_tenant_id": "ORD-001",
+    "state_id": 3,
+    "state_name": "En Preparación",
+    "previous_state_id": 1,
+    "previous_state_name": "Pendiente",
+    "warehouse_id": 1,
+    "updated_fields": ["state_id"],
+    "updated_at": "2024-01-15T11:00:00Z"
+  }
+}
+```
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `previous_state_id` | integer | Estado anterior |
+| `previous_state_name` | string | Nombre del estado anterior |
+| `updated_fields` | array | Campos que fueron modificados |
+</Accordion>
+
+<Accordion title="order/cancelled">
+Se dispara cuando un pedido es cancelado.
+
+**Payload:**
+```json
+{
+  "id": "evt_ghi789",
+  "event": "order/cancelled",
+  "created_at": "2024-01-15T12:00:00Z",
+  "data": {
+    "order_id": 12345,
+    "order_tenant_id": "ORD-001",
+    "state_id": 7,
+    "state_name": "Cancelado",
+    "previous_state_id": 1,
+    "previous_state_name": "Pendiente",
+    "cancellation_reason": "Cliente solicitó cancelación",
+    "cancelled_by": "user@empresa.com",
+    "cancelled_at": "2024-01-15T12:00:00Z"
+  }
+}
+```
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `cancellation_reason` | string | Motivo de la cancelación |
+| `cancelled_by` | string | Usuario que canceló |
+</Accordion>
+
+<Accordion title="order/completed">
+Se dispara cuando un pedido completa su fulfillment (preparado y listo para envío).
+
+**Payload:**
+```json
+{
+  "id": "evt_jkl012",
+  "event": "order/completed",
+  "created_at": "2024-01-15T14:00:00Z",
+  "data": {
+    "order_id": 12345,
+    "order_tenant_id": "ORD-001",
+    "state_id": 5,
+    "state_name": "Completado",
+    "warehouse_id": 1,
+    "items_picked": 5,
+    "total_quantity_picked": 12,
+    "picked_by": "operador@empresa.com",
+    "started_at": "2024-01-15T13:00:00Z",
+    "completed_at": "2024-01-15T14:00:00Z",
+    "duration_minutes": 60
+  }
+}
+```
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `items_picked` | integer | Líneas preparadas |
+| `total_quantity_picked` | integer | Unidades totales preparadas |
+| `picked_by` | string | Operador que preparó |
+| `duration_minutes` | integer | Tiempo de preparación |
+</Accordion>
+
+---
+
+### Productos (Products)
+
+<Accordion title="product/created">
+Se dispara cuando se crea un nuevo producto.
+
+**Payload:**
+```json
+{
+  "id": "evt_mno345",
+  "event": "product/created",
+  "created_at": "2024-01-15T10:30:00Z",
+  "data": {
+    "product_id": 100,
+    "sku": "PROD-001",
+    "barcode": "7891234567890",
+    "name": "Widget A",
+    "description": "Descripción del producto",
+    "category": "Electrónica",
+    "price": 1500.00,
+    "cost": 800.00,
+    "weight": 0.5,
+    "created_at": "2024-01-15T10:30:00Z"
+  }
+}
+```
+</Accordion>
+
+<Accordion title="product/updated">
+Se dispara cuando se modifican los detalles de un producto.
+
+**Payload:**
+```json
+{
+  "id": "evt_pqr678",
+  "event": "product/updated",
+  "created_at": "2024-01-15T11:00:00Z",
+  "data": {
+    "product_id": 100,
+    "sku": "PROD-001",
+    "barcode": "7891234567890",
+    "name": "Widget A - Actualizado",
+    "updated_fields": ["name", "price"],
+    "updated_at": "2024-01-15T11:00:00Z"
+  }
+}
+```
+</Accordion>
+
+<Accordion title="product/deleted">
+Se dispara cuando se elimina un producto.
+
+**Payload:**
+```json
+{
+  "id": "evt_stu901",
+  "event": "product/deleted",
+  "created_at": "2024-01-15T12:00:00Z",
+  "data": {
+    "product_id": 100,
+    "sku": "PROD-001",
+    "barcode": "7891234567890",
+    "name": "Widget A",
+    "deleted_at": "2024-01-15T12:00:00Z"
+  }
+}
+```
+</Accordion>
+
+---
+
+### Stock
+
+<Accordion title="stock/updated">
+Se dispara cuando cambia el nivel de stock de un producto en una ubicación.
+
+**Payload:**
+```json
+{
+  "id": "evt_vwx234",
+  "event": "stock/updated",
+  "created_at": "2024-01-15T10:30:00Z",
+  "data": {
+    "product_id": 100,
+    "sku": "PROD-001",
+    "barcode": "7891234567890",
+    "product_name": "Widget A",
+    "warehouse_id": 1,
+    "warehouse_name": "Depósito Central",
+    "location_id": "A-01-01",
+    "quantity": 50,
+    "previous_quantity": 75,
+    "change": -25,
+    "reason": "order_fulfillment",
+    "reference_id": "ORD-001"
+  }
+}
+```
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `quantity` | integer | Nueva cantidad |
+| `previous_quantity` | integer | Cantidad anterior |
+| `change` | integer | Diferencia (+ o -) |
+| `reason` | string | Motivo del cambio |
+| `reference_id` | string | ID de referencia (pedido, ajuste, etc) |
+
+**Valores de `reason`:**
+- `order_fulfillment` - Preparación de pedido
+- `manual_adjustment` - Ajuste manual
+- `stock_receipt` - Recepción de mercadería
+- `transfer` - Transferencia entre ubicaciones
+- `return` - Devolución
+- `inventory_count` - Conteo de inventario
+</Accordion>
+
+<Accordion title="stock/low_alert">
+Se dispara cuando el stock de un producto cae por debajo del umbral mínimo configurado.
+
+**Payload:**
+```json
+{
+  "id": "evt_yz0567",
+  "event": "stock/low_alert",
+  "created_at": "2024-01-15T10:30:00Z",
+  "data": {
+    "product_id": 100,
+    "sku": "PROD-001",
+    "barcode": "7891234567890",
+    "product_name": "Widget A",
+    "warehouse_id": 1,
+    "warehouse_name": "Depósito Central",
+    "current_quantity": 5,
+    "minimum_threshold": 10,
+    "suggested_reorder": 50
+  }
+}
+```
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `current_quantity` | integer | Stock actual |
+| `minimum_threshold` | integer | Umbral mínimo configurado |
+| `suggested_reorder` | integer | Cantidad sugerida a reponer |
+</Accordion>
+
+<Accordion title="stock/movement_created">
+Se dispara cuando se registra un movimiento de stock (entrada, salida, transferencia).
+
+**Payload:**
+```json
+{
+  "id": "evt_abc890",
+  "event": "stock/movement_created",
+  "created_at": "2024-01-15T10:30:00Z",
+  "data": {
+    "movement_id": 5678,
+    "type": "transfer",
+    "product_id": 100,
+    "sku": "PROD-001",
+    "product_name": "Widget A",
+    "quantity": 20,
+    "from_location": "A-01-01",
+    "to_location": "B-02-03",
+    "warehouse_id": 1,
+    "created_by": "operador@empresa.com",
+    "notes": "Reubicación por espacio",
+    "created_at": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `type` | string | Tipo: `receipt`, `dispatch`, `transfer`, `adjustment` |
+| `from_location` | string | Ubicación origen (null si es entrada) |
+| `to_location` | string | Ubicación destino (null si es salida) |
+</Accordion>
+
+---
+
+### Flujos de Picking (Flows)
+
+<Accordion title="flow/started">
+Se dispara cuando un operador inicia un flujo de picking.
+
+**Payload:**
+```json
+{
+  "id": "evt_def123",
+  "event": "flow/started",
+  "created_at": "2024-01-15T13:00:00Z",
+  "data": {
+    "flow_id": 789,
+    "order_id": 12345,
+    "order_tenant_id": "ORD-001",
+    "warehouse_id": 1,
+    "operator_id": 5,
+    "operator_email": "operador@empresa.com",
+    "items_to_pick": 5,
+    "total_quantity": 12,
+    "started_at": "2024-01-15T13:00:00Z"
+  }
+}
+```
+</Accordion>
+
+<Accordion title="flow/completed">
+Se dispara cuando un flujo de picking se completa exitosamente.
+
+**Payload:**
+```json
+{
+  "id": "evt_ghi456",
+  "event": "flow/completed",
+  "created_at": "2024-01-15T14:00:00Z",
+  "data": {
+    "flow_id": 789,
+    "order_id": 12345,
+    "order_tenant_id": "ORD-001",
+    "warehouse_id": 1,
+    "operator_id": 5,
+    "operator_email": "operador@empresa.com",
+    "items_picked": 5,
+    "total_quantity_picked": 12,
+    "started_at": "2024-01-15T13:00:00Z",
+    "completed_at": "2024-01-15T14:00:00Z",
+    "duration_minutes": 60
+  }
+}
+```
+</Accordion>
+
+<Accordion title="flow/cancelled">
+Se dispara cuando un flujo de picking es cancelado.
+
+**Payload:**
+```json
+{
+  "id": "evt_jkl789",
+  "event": "flow/cancelled",
+  "created_at": "2024-01-15T13:30:00Z",
+  "data": {
+    "flow_id": 789,
+    "order_id": 12345,
+    "order_tenant_id": "ORD-001",
+    "warehouse_id": 1,
+    "operator_id": 5,
+    "operator_email": "operador@empresa.com",
+    "cancellation_reason": "Producto no disponible",
+    "items_picked_before_cancel": 2,
+    "started_at": "2024-01-15T13:00:00Z",
+    "cancelled_at": "2024-01-15T13:30:00Z"
+  }
+}
+```
+</Accordion>
+
+---
+
+## Estructura del Payload
+
+Todos los payloads siguen esta estructura base:
 
 ```json
 {
   "id": "evt_abc123",
-  "event": "order.created",
+  "event": "order/created",
   "created_at": "2024-01-15T10:30:00Z",
   "data": {
     // Datos específicos del evento
@@ -117,43 +456,12 @@ Todos los payloads de webhook siguen esta estructura:
 }
 ```
 
-### Ejemplo: Pedido Creado
-
-```json
-{
-  "id": "evt_abc123",
-  "event": "order.created",
-  "created_at": "2024-01-15T10:30:00Z",
-  "data": {
-    "order_id": 12345,
-    "order_tenant_id": "ORD-001",
-    "state_id": 1,
-    "state_name": "Pending",
-    "warehouse_id": 1,
-    "items_count": 5,
-    "created_at": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-### Ejemplo: Stock Actualizado
-
-```json
-{
-  "id": "evt_def456",
-  "event": "stock.updated",
-  "created_at": "2024-01-15T10:30:00Z",
-  "data": {
-    "product_id": 100,
-    "product_name": "Widget A",
-    "product_barcode": "7891234567890",
-    "location_id": "LOC-A1",
-    "warehouse_id": 1,
-    "quantity": 50,
-    "previous_quantity": 75
-  }
-}
-```
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | string | ID único del evento (usar para idempotencia) |
+| `event` | string | Topic del evento |
+| `created_at` | string | Timestamp ISO 8601 |
+| `data` | object | Payload específico del evento |
 
 ## Verificando Webhooks
 
