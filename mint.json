@@ -105,7 +105,8 @@
         "en/integrations/overview",
         "en/integrations/mercadolibre",
         "en/integrations/tiendanube",
-        "en/integrations/shopify"
+        "en/integrations/shopify",
+        "en/integrations/woocommerce"
       ]
     },
     {
@@ -173,7 +174,8 @@
         "es/integrations/overview",
         "es/integrations/mercadolibre",
         "es/integrations/tiendanube",
-        "es/integrations/shopify"
+        "es/integrations/shopify",
+        "es/integrations/woocommerce"
       ]
     }
   ],
