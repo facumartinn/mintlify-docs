@@ -106,7 +106,8 @@
         "en/integrations/mercadolibre",
         "en/integrations/tiendanube",
         "en/integrations/shopify",
-        "en/integrations/woocommerce"
+        "en/integrations/woocommerce",
+        "en/integrations/vtex"
       ]
     },
     {
@@ -175,7 +176,8 @@
         "es/integrations/mercadolibre",
         "es/integrations/tiendanube",
         "es/integrations/shopify",
-        "es/integrations/woocommerce"
+        "es/integrations/woocommerce",
+        "es/integrations/vtex"
       ]
     }
   ],
