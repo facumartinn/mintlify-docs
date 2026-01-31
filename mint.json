@@ -96,18 +96,7 @@
     {
       "group": "Webhooks",
       "pages": [
-        "en/api-reference/webhooks/overview",
-        "en/api-reference/webhooks/events",
-        "en/api-reference/webhooks/list",
-        "en/api-reference/webhooks/get",
-        "en/api-reference/webhooks/create",
-        "en/api-reference/webhooks/update",
-        "en/api-reference/webhooks/delete",
-        "en/api-reference/webhooks/rotate-secret",
-        "en/api-reference/webhooks/toggle",
-        "en/api-reference/webhooks/deliveries",
-        "en/api-reference/webhooks/stats",
-        "en/api-reference/webhooks/test"
+        "en/api-reference/webhooks/overview"
       ]
     },
     {
@@ -175,18 +164,7 @@
     {
       "group": "Webhooks",
       "pages": [
-        "es/api-reference/webhooks/overview",
-        "es/api-reference/webhooks/events",
-        "es/api-reference/webhooks/list",
-        "es/api-reference/webhooks/get",
-        "es/api-reference/webhooks/create",
-        "es/api-reference/webhooks/update",
-        "es/api-reference/webhooks/delete",
-        "es/api-reference/webhooks/rotate-secret",
-        "es/api-reference/webhooks/toggle",
-        "es/api-reference/webhooks/deliveries",
-        "es/api-reference/webhooks/stats",
-        "es/api-reference/webhooks/test"
+        "es/api-reference/webhooks/overview"
       ]
     },
     {

@@ -1,71 +1,69 @@
 ---
-title: Webhooks Overview
-description: 'Real-time event notifications for your applications'
+title: Webhooks
+description: 'Subscribe to real-time notifications'
 ---
 
-# Webhooks API
+# Webhooks
 
 Webhooks allow you to receive real-time HTTP notifications when events occur in ZenFlow.
 
-<Note>
-  For a comprehensive guide on implementing webhooks, see the [Webhooks Guide](/guides/webhooks).
-</Note>
+<Card
+  title="Webhooks Guide"
+  icon="book"
+  href="/en/guides/webhooks"
+>
+  Check the complete guide to see all available events, sample payloads, and how to verify signatures.
+</Card>
 
-## Available Endpoints
+## Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/webhooks/events` | List available events |
-| GET | `/webhooks` | List webhooks |
-| GET | `/webhooks/:id` | Get webhook details |
-| POST | `/webhooks` | Create webhook |
-| PUT | `/webhooks/:id` | Update webhook |
-| DELETE | `/webhooks/:id` | Delete webhook |
-| POST | `/webhooks/:id/rotate-secret` | Rotate secret |
-| POST | `/webhooks/:id/toggle` | Enable/disable |
-| GET | `/webhooks/:id/deliveries` | Delivery history |
-| GET | `/webhooks/:id/stats` | Statistics |
-| POST | `/webhooks/:id/test` | Send test event |
+| POST | `/webhooks` | Subscribe to events |
+| GET | `/webhooks` | List active subscriptions |
 
-## Event Types
+## Subscribe to Events
 
-| Event | Description |
-|-------|-------------|
-| `order.created` | New order created |
-| `order.updated` | Order updated |
-| `order.cancelled` | Order cancelled |
-| `order.completed` | Order completed |
-| `product.created` | Product created |
-| `product.updated` | Product updated |
-| `product.deleted` | Product deleted |
-| `stock.updated` | Stock level changed |
-| `stock.low_alert` | Stock below minimum |
-| `stock.movement_created` | Stock movement recorded |
-| `flow.started` | Picking flow started |
-| `flow.completed` | Picking flow completed |
-| `flow.cancelled` | Picking flow cancelled |
+To receive notifications, create a webhook specifying your URL and the events you're interested in:
 
-## Webhook Payload
-
-All webhook payloads follow this structure:
+```bash
+POST /api/v1/webhooks
+```
 
 ```json
 {
-  "id": "evt_abc123",
-  "event": "order.created",
-  "created_at": "2024-01-15T10:30:00Z",
-  "data": {
-    // Event-specific data
-  }
+  "name": "My notifications",
+  "url": "https://your-server.com/webhooks/zenflow",
+  "events": ["order/created", "order/completed", "stock/updated"]
 }
 ```
 
-## Security
+### Available Events
 
-Webhooks are signed using HMAC-SHA256. Verify the signature in the `X-Webhook-Signature` header:
+| Category | Events |
+|----------|--------|
+| Orders | `order/created`, `order/updated`, `order/cancelled`, `order/completed` |
+| Products | `product/created`, `product/updated`, `product/deleted` |
+| Stock | `stock/updated`, `stock/low_alert`, `stock/movement_created` |
+| Flows | `flow/started`, `flow/completed`, `flow/cancelled` |
 
+<Warning>
+  Save the `secret` returned in the response. You'll need it to verify signatures. It won't be shown again.
+</Warning>
+
+## Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "wh_abc123",
+    "name": "My notifications",
+    "url": "https://your-server.com/webhooks/zenflow",
+    "events": ["order/created", "order/completed", "stock/updated"],
+    "secret": "whsec_xxxxxxxxxxxxxxxx",
+    "active": true,
+    "created_at": "2024-01-15T10:30:00Z"
+  }
+}
 ```
-t=1705312200,v1=5d4b8c7a...
-```
-
-See [Webhooks Guide](/guides/webhooks#verifying-webhooks) for verification code examples.
