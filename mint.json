@@ -22,7 +22,7 @@
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:support@zenflow.com"
+      "url": "mailto:zenflowsoluciones@gmail.com"
     }
   ],
   "topbarCtaButton": {
@@ -178,6 +178,13 @@
         "es/integrations/shopify",
         "es/integrations/woocommerce",
         "es/integrations/vtex"
+      ]
+    },
+    {
+      "group": "Legal",
+      "pages": [
+        "es/legal/privacy",
+        "es/legal/support"
       ]
     }
   ],
